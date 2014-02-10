@@ -8,13 +8,14 @@
         android:id="@+id/newNameEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Введите новую ссылку"
+        android:text="@string/Vvedite_novuju_ssylku"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
         android:id="@+id/newNameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint=""
         android:ems="10" />
 
 </LinearLayout>

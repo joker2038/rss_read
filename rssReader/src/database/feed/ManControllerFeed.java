@@ -146,7 +146,8 @@ public class ManControllerFeed {
 			description = description.replace("<br />", "\r\n\t");
 
 			description = description.replaceAll("<.*>", "");
-			description = description.replaceAll("&\\S*;", "");
+			description = description.replaceAll("&quot;", "");
+			//description = description.replaceAll("&\\S*;", "");
 			if (i1 < i2)
 			{
 				if ((maxRowsInNames == -1) || (maxRowsInNames >= countRows)) 
