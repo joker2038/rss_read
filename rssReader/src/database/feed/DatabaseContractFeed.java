@@ -17,6 +17,7 @@ public class DatabaseContractFeed {
 		private String description;
 		private String pubDate;
 		private String link;
+		private String favorites;
 		private long id;		
 		
         // Ќиже идут сетеры и гетеры дл€ захвата данных из базы
@@ -39,6 +40,11 @@ public class DatabaseContractFeed {
 		public String getLINK() 
 		{
 			return link;
+		}
+		
+		public String getFAVORITES() 
+		{
+			return favorites;
 		}
 
 		public long getId()
@@ -65,6 +71,11 @@ public class DatabaseContractFeed {
 		{
 			this.link = link;
 		}
+		
+		public void setFAVORITES(String favorites) 
+		{
+			this.favorites = favorites;
+		}
 
 		public void setId(long id) 
 		{
@@ -79,6 +90,7 @@ public class DatabaseContractFeed {
 			public static final String PUPDATE = "pub_date";
 			public static final String LINK = "link";
 			public static final String READ = "read";
+			public static final String FAVORITES = "favorites";
 			public static final String _ID = "_id";
 		}
 	}

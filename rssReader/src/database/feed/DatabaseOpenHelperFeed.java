@@ -14,7 +14,7 @@ import database.feed.DatabaseContractFeed.Names;
 /**  ласс создающий, удал€ющий и редактирующий базу */
 public class DatabaseOpenHelperFeed extends SQLiteOpenHelper
 {
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	private static final String DEBUG_TAG = DatabaseOpenHelperFeed.class.getSimpleName();
 	private static final boolean LOGV = false;
 
@@ -39,7 +39,7 @@ public class DatabaseOpenHelperFeed extends SQLiteOpenHelper
 	@Override
 	public void onCreate(SQLiteDatabase db) 
 	{
-		db.execSQL("CREATE TABLE " + Names.TABLE_NAME + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , " + Names.NamesColumns.TITLE + " TEXT NOT NULL , " + Names.NamesColumns.DESCRIPTION + " TEXT NOT NULL , " + Names.NamesColumns.PUPDATE + " INTEGER NOT NULL , " + Names.NamesColumns.LINK + " TEXT NOT NULL , " + Names.NamesColumns.READ + " TEXT NOT NULL );");
+		db.execSQL("CREATE TABLE " + Names.TABLE_NAME + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , " + Names.NamesColumns.TITLE + " TEXT NOT NULL , " + Names.NamesColumns.DESCRIPTION + " TEXT NOT NULL , " + Names.NamesColumns.PUPDATE + " INTEGER NOT NULL , " + Names.NamesColumns.LINK + " TEXT NOT NULL , " + Names.NamesColumns.READ + " TEXT NOT NULL , " + Names.NamesColumns.FAVORITES + " TEXT );");
 		
 		if (LOGV) 
 		{
@@ -50,6 +50,8 @@ public class DatabaseOpenHelperFeed extends SQLiteOpenHelper
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
 	{
+		if (oldVersion == 1 && newVersion == 2)
+			db.execSQL("ALTER TABLE " + Names.TABLE_NAME + " ADD COLUMN " + Names.NamesColumns.FAVORITES + " TEXT;");
 		Log.d(DEBUG_TAG, "onUpgrade called");
 	}
 }

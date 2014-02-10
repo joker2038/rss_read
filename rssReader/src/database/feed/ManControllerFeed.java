@@ -88,7 +88,18 @@ public class ManControllerFeed {
 				}
 			}
 			cursor.close();
-			quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns.READ	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+			if (comment.equals(" "))
+			{
+				quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns.FAVORITES	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+			}
+			else if (comment.equals("favorites"))
+			{
+				quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns.FAVORITES	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+			}
+			else if (comment.equals("read"))
+			{
+				quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns.READ	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+			}
 			Log.d("", "" + quer);
 			sqliteDB.execSQL(quer);
 			sqliteDB.close();

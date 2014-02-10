@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import menu.main;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -32,6 +35,7 @@ public class AndroidRSSReader extends Activity
 	String feedUrl = "";
 	ListView rssListViewUnread = null;
 	ListView rssListViewRead = null;
+	ListView rssListViewFavorites = null;	
 	ArrayList<RssItem> rssItems = new ArrayList<RssItem>();
 	ArrayAdapter<RssItem> aa = null;
 	String[][] data1;
@@ -95,6 +99,7 @@ public class AndroidRSSReader extends Activity
 
 		rssListViewUnread = (ListView) findViewById(R.id.rssListViewUnread);
 		rssListViewRead = (ListView) findViewById(R.id.rssListViewRead);
+		rssListViewFavorites = (ListView) findViewById(R.id.rssListViewFavorites);
 		
 		TextView label = (TextView) findViewById(R.id.label);
 		label.setTextSize(MainActivity.title_font);
@@ -110,36 +115,7 @@ public class AndroidRSSReader extends Activity
 			@Override
 			public void onItemClick(AdapterView<?> av, View view, int index, long arg3) 
 			{
-				//обновление прочитого
-				DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
-				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				//final Cursor c = sqliteDB.query(Names.TABLE_NAME, null, null, null, null, null, Names.DEFAULT_SORT);				
-				final Cursor cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][index] }, null, null, null);
-				String str0 = null;
-				String str1 = null;
-		        String str2 = null;
-		        String str3 = null;
-				if (cursor1 != null)
-				{
-				      if (cursor1.moveToFirst())
-				      {
-				    	  str0 = cursor1.getString(cursor1.getColumnIndex("_id"));
-				    	  str1 = cursor1.getString(cursor1.getColumnIndex("title"));
-				    	  str2 = cursor1.getString(cursor1.getColumnIndex("description"));
-				    	  str3 = cursor1.getString(cursor1.getColumnIndex("link"));
-				      }
-				      cursor1.close();
-				}
-				ManControllerFeed.update(getBaseContext(), "read", Long.parseLong(str0));	
-				dbhelper.close();
-				sqliteDB.close();
-				refressRssList();
-				
-				Intent intent = new Intent(AndroidRSSReader.this, RssItemDisplayer.class);	
-				intent.putExtra("title", str1);
-				intent.putExtra("description", str2);
-				intent.putExtra("link", str3);
-				startActivity(intent);
+				open(index, "unread");
 			}
 		});		
 		// here we specify what to execute when individual list items clicked
@@ -148,34 +124,117 @@ public class AndroidRSSReader extends Activity
 			@Override
 			public void onItemClick(AdapterView<?> av, View view, int index, long arg3) 
 			{
-				//обновление прочитого
-				DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
-				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
-				final Cursor cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][index] }, null, null, null);
-				String str1 = null;
-		        String str2 = null;
-		        String str3 = null;
-				if (cursor1 != null)
-				{
-					if (cursor1.moveToFirst())
-					{
-						str1 = cursor1.getString(cursor1.getColumnIndex("title"));
-						str2 = cursor1.getString(cursor1.getColumnIndex("description"));
-						str3 = cursor1.getString(cursor1.getColumnIndex("link"));
-					}
-					cursor1.close();
-				}
-				dbhelper.close();
-				sqliteDB.close();
-				refressRssList();
-							
-				Intent intent = new Intent(AndroidRSSReader.this, RssItemDisplayer.class);	
-				intent.putExtra("title", str1);
-				intent.putExtra("description", str2);
-				intent.putExtra("link", str3);
-				startActivity(intent);
+				open(index, "read");
 			}
-		});				
+		});			
+		
+		rssListViewFavorites.setOnItemClickListener(new OnItemClickListener() 
+		{
+			@Override
+			public void onItemClick(AdapterView<?> av, View view, int index, long arg3) 
+			{
+				open(index, "favorites");
+			}
+		});	
+		
+		rssListViewFavorites.setOnItemLongClickListener(new OnItemLongClickListener() 
+		{
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int pos, long id) 
+			{
+				final CharSequence[] items = { "Удалить из избранного" };
+				AlertDialog.Builder builder3 = new AlertDialog.Builder(AndroidRSSReader.this);
+				builder3.setTitle("Выберите действие").setItems(items, new DialogInterface.OnClickListener() 
+				{
+							@Override
+							public void onClick(DialogInterface dialog, int item) 
+							{
+								switch (item) 
+								{
+									case 0: 
+									{										
+										DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+										SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
+										Cursor cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data3[0][pos] }, null, null, null);
+										String str0 = null;
+										if (cursor1 != null)
+										{
+											if (cursor1.moveToFirst())
+											{
+												str0 = cursor1.getString(cursor1.getColumnIndex("_id"));
+											}
+											cursor1.close();
+										}
+										ManControllerFeed.update(getBaseContext(), " ", Long.parseLong(str0));												
+										dbhelper.close();
+										sqliteDB.close();
+										Intent intent = getIntent();
+								        finish();
+								        startActivity(intent);
+									}
+										break;
+								}
+							}
+						});
+				builder3.show();
+				return true;
+			}
+		});
+		
+		rssListViewUnread.setOnItemLongClickListener(new OnItemLongClickListener() 
+		{
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int pos, long id) 
+			{
+				final CharSequence[] items = { "Добавить в избранное" };
+				AlertDialog.Builder builder3 = new AlertDialog.Builder(AndroidRSSReader.this);
+				builder3.setTitle("Выберите действие").setItems(items, new DialogInterface.OnClickListener() 
+				{
+							@Override
+							public void onClick(DialogInterface dialog, int item) 
+							{
+								switch (item) 
+								{
+									case 0: 
+									{										
+										addToFavorites(pos, "unread");
+									}
+										break;
+								}
+							}
+						});
+				builder3.show();
+				return true;
+			}
+		});
+		
+		rssListViewRead.setOnItemLongClickListener(new OnItemLongClickListener() 
+		{
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int pos, long id) 
+			{
+				final CharSequence[] items = { "Добавить в избранное" };
+				AlertDialog.Builder builder3 = new AlertDialog.Builder(AndroidRSSReader.this);
+				builder3.setTitle("Выберите действие").setItems(items, new DialogInterface.OnClickListener() 
+				{
+							@Override
+							public void onClick(DialogInterface dialog, int item) 
+							{
+								switch (item) 
+								{
+									case 0: 
+									{										
+										addToFavorites(pos, "read");
+									}
+										break;
+								}
+							}
+						});
+				builder3.show();
+				return true;
+			}
+		});
+		
 	}
 
 	private void refressRssList() 
@@ -240,7 +299,7 @@ public class AndroidRSSReader extends Activity
 		    c2.close();
 		}
 		
-		final Cursor c3 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.READ + " = ?", new String[] { "favorites" }, null, null, Names.DEFAULT_SORT);
+		final Cursor c3 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.FAVORITES + " = ?", new String[] { "favorites" }, null, null, Names.DEFAULT_SORT);
 		
 		if (c3 != null)
 		{
@@ -272,15 +331,10 @@ public class AndroidRSSReader extends Activity
         	adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data2[0]);
         	adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data3[0]);
         }
-				
-		final ListView lv1 = (ListView) findViewById(R.id.rssListViewUnread);		
-		lv1.setAdapter(adapter1);
-		
-		final ListView lv2 = (ListView) findViewById(R.id.rssListViewRead);		
-		lv2.setAdapter(adapter2);
-		
-		final ListView lv3 = (ListView) findViewById(R.id.rssListViewFavorites);		
-		lv3.setAdapter(adapter3);
+						
+		rssListViewUnread.setAdapter(adapter1);			
+		rssListViewRead.setAdapter(adapter2);		
+		rssListViewFavorites.setAdapter(adapter3);
 		
 		//c.close();	
 		//cursor1.close();
@@ -290,6 +344,85 @@ public class AndroidRSSReader extends Activity
 		//ListActivity.BAZA_NAME = "";
 	}
 
+	private void open(int index, String temp)
+	{
+		//обновление прочитого
+		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
+		Cursor cursor1 = null;
+		if(temp.equals("read"))
+		{
+			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][index] }, null, null, null);
+		}
+		else if (temp.equals("favorites"))
+		{
+			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data3[0][index] }, null, null, null);
+		}
+		else if (temp.equals("unread"))
+		{
+			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][index] }, null, null, null);
+		}
+		String str0 = null;
+		String str1 = null;
+        String str2 = null;
+        String str3 = null;
+		if (cursor1 != null)
+		{
+			if (cursor1.moveToFirst())
+			{
+				str0 = cursor1.getString(cursor1.getColumnIndex("_id"));
+				str1 = cursor1.getString(cursor1.getColumnIndex("title"));
+				str2 = cursor1.getString(cursor1.getColumnIndex("description"));
+				str3 = cursor1.getString(cursor1.getColumnIndex("link"));
+			}
+			cursor1.close();
+		}
+		if (temp.equals("unread"))
+		{
+			ManControllerFeed.update(getBaseContext(), "read", Long.parseLong(str0));
+		}
+		dbhelper.close();
+		sqliteDB.close();
+		refressRssList();
+					
+		Intent intent = new Intent(AndroidRSSReader.this, RssItemDisplayer.class);	
+		intent.putExtra("title", str1);
+		intent.putExtra("description", str2);
+		intent.putExtra("link", str3);
+		startActivity(intent);
+	}
+	
+	private void addToFavorites(int pos,String temp)
+	{
+		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
+		Cursor cursor1 = null;
+		if (temp.equals("unread"))
+		{
+			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][pos] }, null, null, null);
+		}
+		else if (temp.equals("read"))
+		{
+			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][pos] }, null, null, null);
+		}
+		String str0 = null;
+		if (cursor1 != null)
+		{
+			if (cursor1.moveToFirst())
+			{
+				str0 = cursor1.getString(cursor1.getColumnIndex("_id"));
+			}
+			cursor1.close();
+		}
+		ManControllerFeed.update(getBaseContext(), "favorites", Long.parseLong(str0));												
+		dbhelper.close();
+		sqliteDB.close();
+		Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+		
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) 
 	{
