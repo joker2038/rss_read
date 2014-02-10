@@ -73,6 +73,15 @@ public class AndroidRSSReader extends Activity
 	    tabSpec.setContent(R.id.tab2); 
 	    // добавляем в корневой элемент
 	    tabHost.addTab(tabSpec);
+	    
+	    tabSpec = tabHost.newTabSpec("tag3");
+	    // название вкладки
+	    tabSpec.setIndicator("" , getResources().getDrawable(R.drawable.favorites));
+	    // указываем id компонента из FrameLayout, он и станет содержимым
+	    tabSpec.setContent(R.id.tab3); 
+	    // добавляем в корневой элемент
+	    tabHost.addTab(tabSpec);
+	    
 	    // первая вкладка будет выбрана по умолчанию
         tabHost.setCurrentTabByTag("tag1");
         

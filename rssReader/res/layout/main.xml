@@ -58,6 +58,21 @@
                         android:clickable="true" >
                     </ListView>
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tab3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <ListView
+                        android:id="@+id/rssListViewFavorites"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:clickable="true" >
+                    </ListView>
+                </LinearLayout>
+
             </FrameLayout>
         </LinearLayout>
     </TabHost>
