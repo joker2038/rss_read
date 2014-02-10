@@ -8,11 +8,11 @@
         android:id="@+id/newNameEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Введите новое имя"
+        android:text="Введите новую ссылку"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
-        android:id="@+id/nameEdit"
+        android:id="@+id/newNameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10" />

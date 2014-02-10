@@ -1,7 +1,6 @@
 package com.example.rssreader;
 
 import menu.main;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,10 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-
 import database.ManController;
-
 import database.menu.DatabaseContractMenu;
 import database.menu.DatabaseOpenHelperMenu;
 

@@ -14,7 +14,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RadioButton;
 
-import com.example.rssreader.ListActivity;
 import com.example.rssreader.MainActivity;
 import com.example.rssreader.R;
 
@@ -257,7 +256,6 @@ public class main  extends Activity
     		File []fList;        
     		File F = new File("data/data/com.example.rssreader/databases/");
     		int[] nomer;
-    		int temp123 = 0;
         	@Override
 			public void onClick(View arg0) 
 			{          		        

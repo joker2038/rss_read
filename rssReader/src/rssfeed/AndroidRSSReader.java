@@ -4,15 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import menu.main;
-
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,16 +16,13 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.example.rssreader.ListActivity;
 import com.example.rssreader.MainActivity;
 import com.example.rssreader.R;
 
 import database.feed.DatabaseContractFeed.Names;
-import database.feed.DatabaseContractFeed.Names.NamesColumns;
 import database.feed.DatabaseOpenHelperFeed;
 import database.feed.ManControllerFeed;
 
@@ -41,7 +34,13 @@ public class AndroidRSSReader extends Activity
 	ListView rssListViewRead = null;
 	ArrayList<RssItem> rssItems = new ArrayList<RssItem>();
 	ArrayAdapter<RssItem> aa = null;
-
+	String[][] data1;
+	String[][] data2;
+	String[][] data3;
+	ArrayAdapter<String> adapter1 = null;
+	ArrayAdapter<String> adapter2 = null;
+	ArrayAdapter<String> adapter3 = null;
+	
 	public static final int RssItemDialog = 1;
 
 	/** Called when the activity is first created. */
@@ -97,10 +96,6 @@ public class AndroidRSSReader extends Activity
 		rssListViewUnread = (ListView) findViewById(R.id.rssListViewUnread);
 		rssListViewRead = (ListView) findViewById(R.id.rssListViewRead);
 		
-		aa = new ArrayAdapter<RssItem>(this, R.layout.list_item, rssItems);
-		rssListViewUnread.setAdapter(aa);
-		rssListViewRead.setAdapter(aa);
-
 		TextView label = (TextView) findViewById(R.id.label);
 		label.setTextSize(MainActivity.title_font);
 		
@@ -118,22 +113,24 @@ public class AndroidRSSReader extends Activity
 				//обновление прочитого
 				DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				//final Cursor c = sqliteDB.query(Names.TABLE_NAME, null, null, null, null, null, Names.DEFAULT_SORT);
-				ManControllerFeed.update(getBaseContext(), "read", arg3);	
-				final Cursor cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "_id=?", new String[] { "" + arg3 }, null, null, null);
-		        String str1 = "";
-		        String str2 = "";
-		        String str3 = "";
+				//final Cursor c = sqliteDB.query(Names.TABLE_NAME, null, null, null, null, null, Names.DEFAULT_SORT);				
+				final Cursor cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][index] }, null, null, null);
+				String str0 = null;
+				String str1 = null;
+		        String str2 = null;
+		        String str3 = null;
 				if (cursor1 != null)
 				{
 				      if (cursor1.moveToFirst())
 				      {
+				    	  str0 = cursor1.getString(cursor1.getColumnIndex("_id"));
 				    	  str1 = cursor1.getString(cursor1.getColumnIndex("title"));
 				    	  str2 = cursor1.getString(cursor1.getColumnIndex("description"));
 				    	  str3 = cursor1.getString(cursor1.getColumnIndex("link"));
 				      }
 				      cursor1.close();
 				}
+				ManControllerFeed.update(getBaseContext(), "read", Long.parseLong(str0));	
 				dbhelper.close();
 				sqliteDB.close();
 				refressRssList();
@@ -154,10 +151,10 @@ public class AndroidRSSReader extends Activity
 				//обновление прочитого
 				DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
-				final Cursor cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "_id=?", new String[] { "" + arg3 }, null, null, null);
-				String str1 = "";
-				String str2 = "";
-				String str3 = "";
+				final Cursor cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][index] }, null, null, null);
+				String str1 = null;
+		        String str2 = null;
+		        String str3 = null;
 				if (cursor1 != null)
 				{
 					if (cursor1.moveToFirst())
@@ -181,51 +178,9 @@ public class AndroidRSSReader extends Activity
 		});				
 	}
 
-	@Override
-	protected Dialog onCreateDialog(int id, Bundle args) 
-	{
-		switch (id) 
-		{
-			case RssItemDialog: 
-			{
-				LayoutInflater li = LayoutInflater.from(this);
-				View rssDetails = li.inflate(R.layout.rss_details, null);
-	
-				AlertDialog.Builder rssDialog = new AlertDialog.Builder(this);
-				rssDialog.setTitle("Rss Item");
-				rssDialog.setView(rssDetails);
-	
-				return rssDialog.create();
-			}
-		}
-		return null;
-	}
-
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog, Bundle args) 
-	{
-		switch (id) 
-		{
-			case RssItemDialog: 
-			{
-				AlertDialog rssDialog = (AlertDialog) dialog;
-	
-				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy/ hh:mm:ss");
-				rssDialog.setTitle(selectedRssItem.getTitle() + " : " + sdf.format(selectedRssItem.getPubDate()));
-	
-				String text = selectedRssItem.getDescription() + " : " + selectedRssItem.getLink();
-	
-				TextView tv = (TextView) rssDialog.findViewById(R.id.rssDetailsTextView);
-				tv.setText(text);	
-			}
-		}
-	}
-
 	private void refressRssList() 
 	{		
 		ArrayList<RssItem> newItems = RssItem.getRssItems(feedUrl);
-
-		aa.notifyDataSetChanged();
 		
 		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
@@ -256,20 +211,76 @@ public class AndroidRSSReader extends Activity
 		{
 			ManControllerFeed.write(getBaseContext(), '"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str);
 		}
-				
-		final String[] from = { NamesColumns.TITLE };
+
 		final Cursor c1 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.READ + " = ?", new String[] { "unread" }, null, null, Names.DEFAULT_SORT);
+		
+		if (c1 != null)
+		{
+			int iNew = -1;
+			data1 = new String[1][c1.getCount()];
+		    while(c1.moveToNext()) 
+		    {		  
+		    	iNew++;
+		        data1[0][iNew] = c1.getString(1);	        
+		    }
+		    c1.close();
+		}
+		
 		final Cursor c2 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.READ + " = ?", new String[] { "read" }, null, null, Names.DEFAULT_SORT);
 		
-		final int[] to = new int[] { R.id.LinkNew };
+		if (c2 != null)
+		{
+			int iNew = -1;
+			data2 = new String[1][c2.getCount()];
+		    while(c2.moveToNext()) 
+		    {		  
+		    	iNew++;
+		        data2[0][iNew] = c2.getString(1);		        
+		    }
+		    c2.close();
+		}
 		
-		final SimpleCursorAdapter adapter1 = new SimpleCursorAdapter(getApplicationContext(), R.layout.list_news, c1, from, to);
-		final SimpleCursorAdapter adapter2 = new SimpleCursorAdapter(getApplicationContext(), R.layout.list_news, c2, from, to);
+		final Cursor c3 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.READ + " = ?", new String[] { "favorites" }, null, null, Names.DEFAULT_SORT);
 		
+		if (c3 != null)
+		{
+			int iNew = -1;
+			data3 = new String[1][c3.getCount()];
+		    while(c3.moveToNext()) 
+		    {		  
+		    	iNew++;
+		        data3[0][iNew] = c3.getString(1);	        
+		    }
+		    c3.close();
+		}
+		
+		if (MainActivity.channel_list_font == 10)
+        {
+			adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data1[0]);
+			adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data2[0]);
+			adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data3[0]);
+        }
+        else if (MainActivity.channel_list_font == 20)
+        {
+        	adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data1[0]);
+        	adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data2[0]);
+        	adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data3[0]);
+        }
+        else
+        {
+        	adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data1[0]);
+        	adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data2[0]);
+        	adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data3[0]);
+        }
+				
 		final ListView lv1 = (ListView) findViewById(R.id.rssListViewUnread);		
-		lv1.setAdapter(adapter1);		
+		lv1.setAdapter(adapter1);
+		
 		final ListView lv2 = (ListView) findViewById(R.id.rssListViewRead);		
 		lv2.setAdapter(adapter2);
+		
+		final ListView lv3 = (ListView) findViewById(R.id.rssListViewFavorites);		
+		lv3.setAdapter(adapter3);
 		
 		//c.close();	
 		//cursor1.close();

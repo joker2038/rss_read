@@ -10,10 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.provider.BaseColumns;
 import android.util.Log;
-
-import com.example.rssreader.ListActivity;
-
-import database.DatabaseOpenHelper;
 import database.feed.DatabaseContractFeed.Names;
 import database.feed.DatabaseContractFeed.Names.NamesColumns;
 
@@ -139,7 +135,7 @@ public class ManControllerFeed {
 			description = description.replace("<br />", "\r\n\t");
 
 			description = description.replaceAll("<.*>", "");
-			description = description.replaceAll("&.*", "");
+			description = description.replaceAll("&\\S*;", "");
 			if (i1 < i2)
 			{
 				if ((maxRowsInNames == -1) || (maxRowsInNames >= countRows)) 

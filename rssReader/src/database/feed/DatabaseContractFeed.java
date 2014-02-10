@@ -1,9 +1,5 @@
 package database.feed;
 
-import com.example.rssreader.ListActivity;
-
-import database.DatabaseContract.Names.NamesColumns;
-
 import android.provider.BaseColumns;
 
 public class DatabaseContractFeed {

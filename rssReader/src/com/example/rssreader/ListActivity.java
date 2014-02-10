@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,12 +17,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 import database.DatabaseContract.Names;
-import database.DatabaseContract.Names.NamesColumns;
 import database.DatabaseOpenHelper;
 import database.ManController;
 
@@ -32,6 +29,8 @@ public class ListActivity extends Activity
 	final Context context = this;
 	String[] urllink;
 	int rowId = 0;
+	String[][] data = null;
+	ArrayAdapter<String> adapter = null;
 	//טלÿ באחû
 	public static String BAZA_NAME = "";
 		
@@ -40,21 +39,39 @@ public class ListActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.feed_list);
-               		
-		TextView list = (TextView) findViewById(R.id.link);
-		list.setTextSize(MainActivity.channel_list_font);
-		
+				
 		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-		final String[] from = { NamesColumns.NAME, NamesColumns.URL, BaseColumns._ID };
 		final Cursor c = sqliteDB.query(Names.TABLE_NAME, null, null, null, null, null, Names.DEFAULT_SORT);
-		final int i = c.getCount();
-		final int[] to = new int[] { R.id.link };
 				
-		@SuppressWarnings("deprecation")
-		final SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.feed_list, c, from, to);
-		final ListView lv = (ListView) findViewById(R.id.listView1);	
-			
+		if (c != null)
+		{
+			int iNew = -1;
+			data = new String[3][c.getCount()];
+		    while(c.moveToNext()) 
+		    {		  
+		    	iNew++;
+		    	data[0][iNew] = c.getString(0);
+		        data[1][iNew] = c.getString(1);
+		        data[2][iNew] = c.getString(2);
+		    }
+		    c.close();
+		}
+				
+		if (MainActivity.channel_list_font == 10)
+        {
+			adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data[2]);
+        }
+        else if (MainActivity.channel_list_font == 20)
+        {
+        	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data[2]);
+        }
+        else
+        {
+        	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data[2]);
+        }
+		
+		final ListView lv = (ListView) findViewById(R.id.listView1);				
 		
 		lv.setAdapter(adapter);
 			
@@ -63,10 +80,10 @@ public class ListActivity extends Activity
 			@Override
 			public void onItemClick(AdapterView<?> a, View v, int position, long id) 
 			{
-				BAZA_NAME = c.getString(2).replace( " ", "" );
+				BAZA_NAME = data[2][position].replace( " ", "" );
 				Intent intent = new Intent(ListActivity.this, AndroidRSSReader.class);	
-				intent.putExtra("urlLink", c.getString(1));
-				intent.putExtra("name", c.getString(2));
+				intent.putExtra("urlLink", data[1][position]);
+				intent.putExtra("name", data[2][position]);
 				startActivity(intent);
 			}
 		});
@@ -89,11 +106,12 @@ public class ListActivity extends Activity
 									{										
 										DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 										SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-										ManController.delete(getBaseContext(), adapter.getItemId(pos));		
-										final Cursor c = sqliteDB.query(Names.TABLE_NAME, null, null, null, null, null, Names.DEFAULT_SORT);										
-										adapter.changeCursor(c);
+										ManController.delete(getBaseContext(), Long.parseLong(data[0][pos]));	
 										dbhelper.close();
 										sqliteDB.close();
+										Intent intent = getIntent();
+								        finish();
+								        startActivity(intent);
 									}
 										break;
 									case 1: 
@@ -104,7 +122,8 @@ public class ListActivity extends Activity
 										AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 										// הוכאול ודמ הטאכמדמל
 										alertDialogBuilder.setView(promptsView);
-										final EditText userInput = (EditText) promptsView.findViewById(R.id.nameEdit);
+										final EditText userInput = (EditText) promptsView.findViewById(R.id.newNameEditText);
+										userInput.setText(data[1][pos]);
 										// גוראול םא םודמ סמבûעטו
 										alertDialogBuilder.setCancelable(false).setPositiveButton("OK",	new DialogInterface.OnClickListener() 
 												{
@@ -113,11 +132,12 @@ public class ListActivity extends Activity
 													{
 														DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 														SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-														ManController.update(getBaseContext(), userInput.getText().toString(), adapter.getItemId(pos));		
-														final Cursor c = sqliteDB.query(Names.TABLE_NAME, null, null, null, null, null, Names.DEFAULT_SORT);
-														adapter.changeCursor(c);
+														ManController.update(getBaseContext(), userInput.getText().toString(), Long.parseLong(data[0][pos]));		
 														dbhelper.close();
 														sqliteDB.close();
+														Intent intent = getIntent();
+												        finish();
+												        startActivity(intent);
 													}
 												})
 												.setNegativeButton("Cancel", new DialogInterface.OnClickListener() 

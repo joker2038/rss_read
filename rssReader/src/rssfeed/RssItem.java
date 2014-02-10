@@ -1,7 +1,5 @@
 package rssfeed;
 
-import android.content.Context;
-
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -15,8 +13,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import database.feed.ManControllerFeed;
 
 public class RssItem {
 
