@@ -18,14 +18,17 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.example.rssreader.ListActivity;
 import com.example.rssreader.MainActivity;
 import com.example.rssreader.R;
 
 import database.feed.DatabaseContractFeed.Names;
+import database.feed.DatabaseContractFeed;
 import database.feed.DatabaseOpenHelperFeed;
 import database.feed.ManControllerFeed;
 
@@ -235,41 +238,55 @@ public class AndroidRSSReader extends Activity
 			}
 		});
 		
+		ImageButton imageButton1 = (ImageButton) findViewById(R.id.imageButton1);
+
+		imageButton1.setOnClickListener(new View.OnClickListener() 
+		{
+		    public void onClick(View v) 
+		    {
+		    	ListActivity.BAZA_NAME = getIntent().getStringExtra("name").toString();
+	    		
+	    		ArrayList<RssItem> newItems = new ArrayList<RssItem>();
+	    		newItems.clear();
+	    		newItems = RssItem.getRssItems(feedUrl);
+	    	
+	    		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+	    		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
+	    		Cursor cursor1 = null;
+	    		cursor1 = sqliteDB.query(DatabaseContractFeed.Names.TABLE_NAME, new String[] {"max(" + DatabaseContractFeed.Names.NamesColumns.PUPDATE + ")"}, null, null, null, null, null);
+	    		String str = "0";
+	    		if (cursor1 != null)
+	    		{
+	    			if (cursor1.moveToFirst())
+	    			{
+	    				for (String cn : cursor1.getColumnNames())
+	    				{
+	    					if (cursor1.getString(cursor1.getColumnIndex(cn)) !=null )
+	    					{
+	    						str = cursor1.getString(cursor1.getColumnIndex(cn));
+	    					}	
+	    				}
+	    			}
+	    			cursor1.close();
+	    		}
+	    		
+	    		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+	    	
+	    		for (int i = 0; i < newItems.size(); i++)
+	    		{
+	    			ManControllerFeed.write(getBaseContext(), '"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str);
+	    		}
+	    		refressRssList();
+		    }
+		});
+		
 	}
 
 	public void refressRssList() 
 	{		
-		ArrayList<RssItem> newItems = RssItem.getRssItems(feedUrl);
 		
 		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
-		Cursor cursor1 = null;
-		cursor1 = sqliteDB.query("feed", new String[] {"max(" + Names.NamesColumns.PUPDATE + ")"}, null, null, null, null, null);
-        String str = "0";
-		if (cursor1 != null)
-		{
-		      if (cursor1.moveToFirst())
-		      {
-		        for (String cn : cursor1.getColumnNames())
-		        {
-		        	if (cursor1.getString(cursor1.getColumnIndex(cn)) !=null )
-				      {
-				    	  str = cursor1.getString(cursor1.getColumnIndex(cn));
-				      }
-		        }
-		      }
-		      cursor1.close();
-		}
-
-		//rssItems.clear();
-		//rssItems.addAll(newItems);
-		//SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
-		
-		for (int i = 0; i < newItems.size(); i++)
-		{
-			ManControllerFeed.write(getBaseContext(), '"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str);
-		}
 
 		final Cursor c1 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.READ + " = ?", new String[] { "unread" }, null, null, Names.DEFAULT_SORT);
 		

@@ -195,7 +195,7 @@ public class ManControllerFeed {
 	{
 			DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(context);
 			SQLiteDatabase sqliteDB = dbhelper.getWritableDatabase();
-			sqliteDB.delete(Names.TABLE_NAME, Names.NamesColumns.PUPDATE  + " < " + l, null);
+			sqliteDB.delete(Names.TABLE_NAME, Names.NamesColumns.PUPDATE  + " <= " + l, null);
 			sqliteDB.close();
 			dbhelper.close();
 	}

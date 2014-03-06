@@ -35,6 +35,11 @@ import database.menu.ManControllerMenu;
 
 public class main  extends Activity
 {	
+	Timer timer1 = new Timer();
+	boolean flagTimer1 = false;
+	Timer timer2 = new Timer();
+	boolean flagTimer2 = false;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
@@ -386,15 +391,19 @@ public class main  extends Activity
 		    	 sqliteDB.close();
 		     }
 		}
+		flagTimer1 = false;
 	}
      
     public void update() 
 	{    		
     	for (int j = 0; j < MainActivity.data[0].length; j++)
     	{
+    		ListActivity.BAZA_NAME = "";
     		ListActivity.BAZA_NAME = MainActivity.data[2][j].replace(" ", "");
-		    	 
-    		ArrayList<RssItem> newItems = RssItem.getRssItems(MainActivity.data[1][j]);
+    		
+    		ArrayList<RssItem> newItems = new ArrayList<RssItem>();
+    		newItems.clear();
+    		newItems = RssItem.getRssItems(MainActivity.data[1][j]);
     	
     		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
     		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
@@ -415,10 +424,7 @@ public class main  extends Activity
     			}
     			cursor1.close();
     		}
-    	
-    		//rssItems.clear();
-    		//rssItems.addAll(newItems);
-    		//SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+    		
     		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
     	
     		for (int i = 0; i < newItems.size(); i++)
@@ -426,63 +432,82 @@ public class main  extends Activity
     			ManControllerFeed.write(getBaseContext(), '"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str);
     		}
     	}
+    	flagTimer2 = false;
 	}     
     
     @Override
     public void onBackPressed()
-    {    
-		Timer timer1 = new Timer();
-		
-    	if (MainActivity.storage_time == 1)
+    {  
+    	if (flagTimer2 == false)
     	{
-    		timer1.schedule( new TimerTask()
-    		{          
-    			@Override
-    			public void run() 
-    			{
-    				delete();
-    			}
+    		flag2:
+    		if (flagTimer1 == true)
+    		{
+    			break flag2;  	   	
     		}
-    		, 0, MainActivity.storage_time * 86400000);
-    	}
-    	else
-    	{
-    		timer1.schedule( new TimerTask()
-    		{          
-    			@Override
-    			public void run() 
-    			{
-    				delete();
-    			}
-    		}
-    		, MainActivity.storage_time/2 * 43200000, MainActivity.storage_time/2 * 43200000);
+    		
+	    	if (MainActivity.update_time == 1)
+	    	{
+	    		timer2.schedule( new TimerTask()
+	    		{          
+	    			@Override
+	    			public void run() 
+	    			{
+	    				update();
+	    			}
+	    		}
+	    		, 0, MainActivity.update_time * 3600000);
+	    		flagTimer2 = true;
+	    	}
+	    	else if (MainActivity.update_time > 1)
+	    	{
+	    		timer2.schedule( new TimerTask()
+	    		{          
+	    			@Override
+	    			public void run() 
+	    			{
+	    				update();
+	    			}
+	    		}
+	    		, MainActivity.update_time/2 * 1800000, MainActivity.update_time/2 * 1800000);
+	    		flagTimer2 = true;
+	    	}
     	}
     	
-    	Timer timer2 = new Timer();
-    	
-    	if (MainActivity.update_time == 1)
+    	if (flagTimer1 == false)
     	{
-    		timer2.schedule( new TimerTask()
-    		{          
-    			@Override
-    			public void run() 
-    			{
-    				update();
-    			}
+    		flag1:
+    		if (flagTimer2 == true)
+    		{
+    			break flag1;  	
     		}
-    		, 0, MainActivity.update_time * 3600000);
-    	}
-    	else
-    	{
-    		timer2.schedule( new TimerTask()
-    		{          
-    			@Override
-    			public void run() 
-    			{
-    				update();
-    			}
-    		}
-    		, MainActivity.update_time/2 * 1800000, MainActivity.update_time/2 * 1800000);
+    		
+	    	if (MainActivity.storage_time == 1)
+	    	{
+	    		timer1.schedule( new TimerTask()
+	    		{          
+	    			@Override
+	    			public void run() 
+	    			{
+	    				delete();
+	    			}
+	    		}
+	    		, 0, MainActivity.storage_time * 86400000);
+	    		flagTimer1 = true;
+	    	}
+	    	else if (MainActivity.storage_time > 1)
+	    	{
+	    		timer1.schedule( new TimerTask()
+	    		{          
+	    			@Override
+	    			public void run() 
+	    			{
+	    				delete();
+	    			}
+	    		}
+	    		, MainActivity.storage_time/2 * 43200000, MainActivity.storage_time/2 * 43200000);
+	    		flagTimer1 = true;
+	    	}
     	}
     	
     	Intent intent = new Intent(main.this , MainActivity.class);
