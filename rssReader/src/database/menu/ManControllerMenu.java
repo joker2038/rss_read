@@ -35,7 +35,7 @@ public class ManControllerMenu
 		{
 			DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(context);
 			SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-			String[] columnsToTake = { BaseColumns._ID, NamesColumns._TITLE_FONT, NamesColumns._NEWS_FONT, NamesColumns._CHANNAL_LIST_FONT };
+			String[] columnsToTake = { BaseColumns._ID, NamesColumns._TITLE_FONT, NamesColumns._NEWS_FONT, NamesColumns._CHANNAL_LIST_FONT, NamesColumns._STORAGE_TIME };
 			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, columnsToTake, null, null, null, null, null);
 			
 			if (cursor.moveToFirst())
@@ -50,6 +50,7 @@ public class ManControllerMenu
 				oneRow.set_title_font(cursor.getString(cursor.getColumnIndexOrThrow(NamesColumns._TITLE_FONT)));
 				oneRow.set_news_font(cursor.getString(cursor.getColumnIndexOrThrow(NamesColumns._NEWS_FONT)));
 				oneRow.set_channel_list_font(cursor.getString(cursor.getColumnIndexOrThrow(NamesColumns._CHANNAL_LIST_FONT)));
+				oneRow.set_channel_list_font(cursor.getString(cursor.getColumnIndexOrThrow(NamesColumns._STORAGE_TIME)));
 				list.add(oneRow);
 			}
 			cursor.close();
@@ -171,57 +172,39 @@ public class ManControllerMenu
 			Log.e(TAG, "Failed to update Names. ", e);
 		}
 	}
-
-	public static void write(Context context, String title_font, String news_font, String channel_list_font)
+	
+	public static void update_storage_time(Context context, String comment, long l) 
 	{
 		try 
 		{
-			//создали нашу базу и открыли для записи
 			DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(context);
 			SQLiteDatabase sqliteDB = dbhelper.getWritableDatabase();
 			String quer = null;
 			int countRows = -1;
-			//Открыли курсор для записи
-			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, null);	
+			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, null);
 			
 			if (cursor.moveToFirst()) 
 			{
-				countRows = cursor.getInt(0);				
-				if (LOGV)
+				countRows = cursor.getInt(0);
+				if (LOGV) 
 				{
 					Log.v(TAG, "Count in Names table" + String.valueOf(countRows));
 				}
 			}
-			if ((maxRowsInNames == -1) || (maxRowsInNames >= countRows)) 
-			{
-				countRows = cursor.getInt(0);
-				//дальще наш запрос в базу для записи полученных дынных из функции
-				quer = String.format("INSERT INTO %s (%s, %s, %s) VALUES (%s, %s, %s);",
-						// таблица
-						Names.TABLE_NAME,
-						// колонки
-						Names.NamesColumns._NEWS_FONT,
-						Names.NamesColumns._TITLE_FONT,
-						Names.NamesColumns._CHANNAL_LIST_FONT,
-						// поля
-						title_font,
-						news_font,
-						channel_list_font
-						);
-			}	
-			sqliteDB.execSQL(quer);
-			//закрыли всю базу
 			cursor.close();
+			quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns._STORAGE_TIME	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+			Log.d("", "" + quer);
+			sqliteDB.execSQL(quer);
 			sqliteDB.close();
 			dbhelper.close();
 		} 
-		catch (SQLiteException e) 
+		catch (SQLiteException e)
 		{
-			Log.e(TAG, "Failed open rimes database. ", e);
+			Log.e(TAG, "Failed open database. ", e);
 		} 
 		catch (SQLException e) 
 		{
-			Log.e(TAG, "Failed to insert Names. ", e);
+			Log.e(TAG, "Failed to update Names. ", e);
 		}
 	}
 }

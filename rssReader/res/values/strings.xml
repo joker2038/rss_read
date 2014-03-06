@@ -2,12 +2,25 @@
 <resources>
 
     <string name="app_name">rss reader</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="add">add</string>
-    <string name="feed_list">feed list</string>
-    <string name="NAME">NAME</string>
-    <string name="URL_LINK">URL LINK</string>
+    <string name="action_settings">Настройки</string>
+    <string name="add">добавить</string>
+    <string name="feed_list">список каналов</string>
+    <string name="NAME">имя</string>
+    <string name="URL_LINK">ссылка</string>
     <string name="Vvedite_novuju_ssylku">Введите новую ссылку</string>
+    <string name="Big">большой</string>
+    <string name="all">всю</string>
+    <string name="one">одну</string>
+    <string name="medium">средний</string>
+    <string name="small">маленький</string>
+    <string name="clear_history">очистить историю</string>
+    <string name="headline_font_size">размер шрифта заголовка</string>
+    <string name="font_size_News">размер шрифта новости</string>
+    <string name="font_size_of_the_channel_list">размер шрифта списка каналов</string>
+    <string name="storage_news">хранение новости</string>
+    <string name="history_hint">установите ноль чтобы не удалять историю или введите срок хранения</string>
+    <string name="Day">Дней</string>
+    <string name="plus">+</string>
+    <string name="minus">-</string>
 
 </resources>

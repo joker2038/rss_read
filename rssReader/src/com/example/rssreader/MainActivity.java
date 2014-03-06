@@ -22,13 +22,14 @@ public class MainActivity  extends Activity
 	public static int title_font = 0;
 	public static int news_font = 0;
 	public static int channel_list_font = 0;
-	
+	public static int storage_time = 0;
+		
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        		
+          		
         DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
 		final Cursor c = sqliteDB.query(DatabaseContractMenu.Names.TABLE_NAME, null, null, null, null, null, null);
@@ -39,6 +40,7 @@ public class MainActivity  extends Activity
 		    	  title_font = Integer.parseInt(c.getString(c.getColumnIndex("title_font")));
 		    	  news_font = Integer.parseInt(c.getString(c.getColumnIndex("news_font")));
 		    	  channel_list_font = Integer.parseInt(c.getString(c.getColumnIndex("channel_list_font")));
+		    	  storage_time = Integer.parseInt(c.getString(c.getColumnIndex("storage_time")));
 		      }
 		      c.close();
 		}

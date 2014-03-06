@@ -1,7 +1,12 @@
 package menu;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,21 +18,61 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
+import com.example.rssreader.ListActivity;
 import com.example.rssreader.MainActivity;
 import com.example.rssreader.R;
 
+import database.feed.DatabaseOpenHelperFeed;
+import database.feed.ManControllerFeed;
 import database.menu.DatabaseOpenHelperMenu;
 import database.menu.ManControllerMenu;
 
 public class main  extends Activity
-{		
+{	
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
         
+    	final TextView storage_news = (TextView) findViewById(R.id.storage_news);
+    	
+    	storage_news.setText("" + MainActivity.storage_time);
+    	
+    	Button plus = (Button) findViewById(R.id.plus);
+    	
+    	plus.setOnClickListener(new OnClickListener() 
+        {
+			@Override
+			public void onClick(View arg0) 
+			{		
+				if(MainActivity.storage_time < 25)
+				{
+					MainActivity.storage_time++;
+					ManControllerMenu.update_storage_time(getBaseContext(), String.valueOf(MainActivity.storage_time), 1);
+					storage_news.setText("" + MainActivity.storage_time);		
+				}
+			}			
+		});
+    	
+    	Button minus = (Button) findViewById(R.id.minus);
+    	
+    	minus.setOnClickListener(new OnClickListener() 
+        {
+			@Override
+			public void onClick(View arg0) 
+			{		
+				if(MainActivity.storage_time > 0)
+				{
+					MainActivity.storage_time--;
+					ManControllerMenu.update_storage_time(getBaseContext(), String.valueOf(MainActivity.storage_time), 1);				
+					storage_news.setText("" + MainActivity.storage_time);	
+				}
+			}			
+		});   
+    	
         //первая группа
         RadioButton gr0_rad0 = (RadioButton)findViewById(R.id.gr0_radio0);
         RadioButton gr0_rad1 = (RadioButton)findViewById(R.id.gr0_radio1);
@@ -86,10 +131,7 @@ public class main  extends Activity
         Button all = (Button) findViewById(R.id.all);
         //удалить одну базу
         Button one = (Button) findViewById(R.id.one);
-        
-        
-        
-        
+              
         // title_font
         
         //gr0 раз
@@ -270,7 +312,7 @@ public class main  extends Activity
         		     //Нужны только папки в место isFile() пишим isDirectory()
         		     if (fList[i].isFile())
         		     {
-        		         if(fList[i].getName().equals("setting.db") || fList[i].getName().equals("FeedList.db") || fList[i].getName().matches(".*.db-journal") )
+        		         if(fList[i].getName().equals("setting.db") || fList[i].getName().equals("FeedList.db") || fList[i].getName().matches(".*-journal") )
         		         {        		           		        	 
         		         }
         		         else 
@@ -295,12 +337,59 @@ public class main  extends Activity
 						});
 				builder3.show();
 			}
-        });   
+        });    
     }
-    
+   
+    public void delete() 
+	{
+    	File []fList;        
+		File F = new File("data/data/com.example.rssreader/databases/");
+    	fList = F.listFiles();
+		for(int i=0; i<fList.length; i++)           
+		{
+		     //Нужны только папки в место isFile() пишим isDirectory()
+		     if (fList[i].isFile())
+		     {
+		         if(!fList[i].getName().equals("setting.db") && !fList[i].getName().equals("FeedList.db") && !fList[i].getName().matches(".*-journal") )
+		         {   
+		        	 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+		        	 Calendar Current_Calendar = Calendar.getInstance();
+		        	 Date Current_Date = Current_Calendar.getTime();
+		        	 long dateTemp = 0;
+		      		 String dateNow = sdf.format(Current_Date);
+		         	 ListActivity.BAZA_NAME = fList[i].getName().replace(".db", "");  
+		          	 DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+		     		 SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
+		     		 dateTemp = Long.parseLong(dateNow) - MainActivity.storage_time * 1000000 ;
+		     		 ManControllerFeed.delete(getBaseContext(), dateTemp);	
+		     		 dbhelper.close();
+		     		 sqliteDB.close();
+		        	 //main.delete(fList[i].getName().toString());
+		         }
+		     }
+		}
+
+		
+	}
+  
     @Override
     public void onBackPressed()
-    {
+    {        
+        Timer     timer = new Timer();
+    	
+    	if (MainActivity.storage_time > 0)
+    	{
+	    	timer.schedule( new TimerTask()
+	    						{          
+	    							@Override
+	    							public void run() 
+	    							{
+	    								delete();
+	    							}
+	    						}
+	    					, 0, MainActivity.storage_time );
+    	}
+    	
     	Intent intent = new Intent(main.this , MainActivity.class);
 	    startActivity(intent);
     }
