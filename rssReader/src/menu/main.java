@@ -8,10 +8,12 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import rssfeed.RssItem;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
@@ -24,8 +26,10 @@ import com.example.rssreader.ListActivity;
 import com.example.rssreader.MainActivity;
 import com.example.rssreader.R;
 
+import database.feed.DatabaseContractFeed;
 import database.feed.DatabaseOpenHelperFeed;
 import database.feed.ManControllerFeed;
+import database.menu.DatabaseContractMenu.Names;
 import database.menu.DatabaseOpenHelperMenu;
 import database.menu.ManControllerMenu;
 
@@ -38,27 +42,24 @@ public class main  extends Activity
         setContentView(R.layout.settings);
         
     	final TextView storage_news = (TextView) findViewById(R.id.storage_news);
-    	
     	storage_news.setText("" + MainActivity.storage_time);
-    	
+    	   
     	Button plus = (Button) findViewById(R.id.plus);
-    	
     	plus.setOnClickListener(new OnClickListener() 
         {
 			@Override
 			public void onClick(View arg0) 
 			{		
 				if(MainActivity.storage_time < 25)
-				{
+				{					
 					MainActivity.storage_time++;
-					ManControllerMenu.update_storage_time(getBaseContext(), String.valueOf(MainActivity.storage_time), 1);
-					storage_news.setText("" + MainActivity.storage_time);		
+					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._STORAGE_TIME, String.valueOf(MainActivity.storage_time), 1);				
+			    	storage_news.setText("" + MainActivity.storage_time);			
 				}
 			}			
 		});
     	
     	Button minus = (Button) findViewById(R.id.minus);
-    	
     	minus.setOnClickListener(new OnClickListener() 
         {
 			@Override
@@ -67,11 +68,44 @@ public class main  extends Activity
 				if(MainActivity.storage_time > 0)
 				{
 					MainActivity.storage_time--;
-					ManControllerMenu.update_storage_time(getBaseContext(), String.valueOf(MainActivity.storage_time), 1);				
-					storage_news.setText("" + MainActivity.storage_time);	
+					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._STORAGE_TIME, String.valueOf(MainActivity.storage_time), 1);				
+			    	storage_news.setText("" + MainActivity.storage_time);		
 				}
 			}			
-		});   
+		});  
+    	
+    	final TextView update_time = (TextView) findViewById(R.id.update_time);
+    	update_time.setText("" + MainActivity.update_time);
+    	
+    	Button plusNews = (Button) findViewById(R.id.pluseNews);
+    	plusNews.setOnClickListener(new OnClickListener() 
+        {
+			@Override
+			public void onClick(View arg0) 
+			{		
+				if(MainActivity.update_time < 24)
+				{					
+					MainActivity.update_time++;
+					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._UPDATE_TIME, String.valueOf(MainActivity.update_time), 1);						
+					update_time.setText("" + MainActivity.update_time);			
+				}
+			}			
+		});
+    	
+    	Button minusNews = (Button) findViewById(R.id.minusNews);
+    	minusNews.setOnClickListener(new OnClickListener() 
+        {
+			@Override
+			public void onClick(View arg0) 
+			{		
+				if(MainActivity.update_time > 0)
+				{
+					MainActivity.update_time--;
+					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._UPDATE_TIME, String.valueOf(MainActivity.update_time), 1);						
+					update_time.setText("" + MainActivity.update_time);;		
+				}
+			}			
+		});  
     	
         //первая группа
         RadioButton gr0_rad0 = (RadioButton)findViewById(R.id.gr0_radio0);
@@ -142,7 +176,7 @@ public class main  extends Activity
 			{          		
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_title_font(getBaseContext(), "10", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._TITLE_FONT, "10", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -156,7 +190,7 @@ public class main  extends Activity
 			{  
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_title_font(getBaseContext(), "20", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._TITLE_FONT, "20", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -170,7 +204,7 @@ public class main  extends Activity
 			{  
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_title_font(getBaseContext(), "40", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._TITLE_FONT, "40", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -186,7 +220,7 @@ public class main  extends Activity
 			{  
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_news_font(getBaseContext(), "10", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._NEWS_FONT, "10", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -200,7 +234,7 @@ public class main  extends Activity
 			{  
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_news_font(getBaseContext(), "20", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._NEWS_FONT, "20", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -214,7 +248,7 @@ public class main  extends Activity
 			{  
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_news_font(getBaseContext(), "40", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._NEWS_FONT, "40", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -230,7 +264,7 @@ public class main  extends Activity
 			{  
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_channel_list_font(getBaseContext(), "10", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._CHANNAL_LIST_FONT, "10", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -244,7 +278,7 @@ public class main  extends Activity
 			{  
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_channel_list_font(getBaseContext(), "20", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._CHANNAL_LIST_FONT, "20", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -258,7 +292,7 @@ public class main  extends Activity
 			{  
         		DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 				SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-				ManControllerMenu.update_channel_list_font(getBaseContext(), "40", 1);		
+				ManControllerMenu.update(getBaseContext(), Names.NamesColumns._CHANNAL_LIST_FONT, "40", 1);		
 				dbhelper.close();
 				sqliteDB.close();
 			}
@@ -278,15 +312,9 @@ public class main  extends Activity
         		for(int i=0; i<fList.length; i++)           
         		{
         		     //Нужны только папки в место isFile() пишим isDirectory()
-        		     if (fList[i].isFile())
-        		     {
-        		         if(fList[i].getName().equals("setting.db") || fList[i].getName().equals("setting.db-journal") || fList[i].getName().equals("FeedList.db-journal") || fList[i].getName().equals("FeedList.db"))
-        		         {        		           		        	 
-        		         }
-        		         else 
-        		         {        		           	 
-        		        	 fList[i].delete();  
-        		         }
+        		     if (fList[i].isFile() && !fList[i].getName().equals("setting.db") && !fList[i].getName().equals("FeedList.db") && !fList[i].getName().matches(".*-journal"))
+        		     { 
+        		    	 fList[i].delete();  
         		     }
         		}
 			}
@@ -310,17 +338,11 @@ public class main  extends Activity
         		for(int i=0; i<fList.length; i++)           
         		{
         		     //Нужны только папки в место isFile() пишим isDirectory()
-        		     if (fList[i].isFile())
-        		     {
-        		         if(fList[i].getName().equals("setting.db") || fList[i].getName().equals("FeedList.db") || fList[i].getName().matches(".*-journal") )
-        		         {        		           		        	 
-        		         }
-        		         else 
-        		         {        		           	 
-        		        	 massiv.add(fList[i].getName());  
-        		        	 nomer[temp123] = i;
-        		        	 temp123++;
-        		         }
+        			if (fList[i].isFile() && !fList[i].getName().equals("setting.db") && !fList[i].getName().equals("FeedList.db") && !fList[i].getName().matches(".*-journal"))
+       		     	{        		           	 
+        				massiv.add(fList[i].getName());  
+        				nomer[temp123] = i;
+        				temp123++;
         		     }
         		}
         		
@@ -348,46 +370,119 @@ public class main  extends Activity
 		for(int i=0; i<fList.length; i++)           
 		{
 		     //Нужны только папки в место isFile() пишим isDirectory()
-		     if (fList[i].isFile())
-		     {
-		         if(!fList[i].getName().equals("setting.db") && !fList[i].getName().equals("FeedList.db") && !fList[i].getName().matches(".*-journal") )
-		         {   
-		        	 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
-		        	 Calendar Current_Calendar = Calendar.getInstance();
-		        	 Date Current_Date = Current_Calendar.getTime();
-		        	 long dateTemp = 0;
-		      		 String dateNow = sdf.format(Current_Date);
-		         	 ListActivity.BAZA_NAME = fList[i].getName().replace(".db", "");  
-		          	 DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
-		     		 SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
-		     		 dateTemp = Long.parseLong(dateNow) - MainActivity.storage_time * 1000000 ;
-		     		 ManControllerFeed.delete(getBaseContext(), dateTemp);	
-		     		 dbhelper.close();
-		     		 sqliteDB.close();
-		        	 //main.delete(fList[i].getName().toString());
-		         }
+		     if (fList[i].isFile() && !fList[i].getName().equals("setting.db") && !fList[i].getName().equals("FeedList.db") && !fList[i].getName().matches(".*-journal") )
+		     {   
+		    	 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+		    	 Calendar Current_Calendar = Calendar.getInstance();
+		    	 Date Current_Date = Current_Calendar.getTime();
+		    	 long dateTemp = 0;
+		    	 String dateNow = sdf.format(Current_Date);
+		    	 ListActivity.BAZA_NAME = fList[i].getName().replace(".db", "");  
+		    	 DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+		    	 SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
+		    	 dateTemp = Long.parseLong(dateNow) - MainActivity.storage_time * 1000000 ;
+		    	 ManControllerFeed.delete(getBaseContext(), dateTemp);	
+		    	 dbhelper.close();
+		    	 sqliteDB.close();
 		     }
 		}
-
-		
 	}
-  
+     
+    public void update() 
+	{    		
+    	for (int j = 0; j < MainActivity.data[0].length; j++)
+    	{
+    		ListActivity.BAZA_NAME = MainActivity.data[2][j].replace(" ", "");
+		    	 
+    		ArrayList<RssItem> newItems = RssItem.getRssItems(MainActivity.data[1][j]);
+    	
+    		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+    		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
+    		Cursor cursor1 = null;
+    		cursor1 = sqliteDB.query(DatabaseContractFeed.Names.TABLE_NAME, new String[] {"max(" + DatabaseContractFeed.Names.NamesColumns.PUPDATE + ")"}, null, null, null, null, null);
+    		String str = "0";
+    		if (cursor1 != null)
+    		{
+    			if (cursor1.moveToFirst())
+    			{
+    				for (String cn : cursor1.getColumnNames())
+    				{
+    					if (cursor1.getString(cursor1.getColumnIndex(cn)) !=null )
+    					{
+    						str = cursor1.getString(cursor1.getColumnIndex(cn));
+    					}	
+    				}
+    			}
+    			cursor1.close();
+    		}
+    	
+    		//rssItems.clear();
+    		//rssItems.addAll(newItems);
+    		//SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+    		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+    	
+    		for (int i = 0; i < newItems.size(); i++)
+    		{
+    			ManControllerFeed.write(getBaseContext(), '"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str);
+    		}
+    	}
+	}     
+    
     @Override
     public void onBackPressed()
-    {        
-        Timer     timer = new Timer();
-    	
-    	if (MainActivity.storage_time > 0)
+    {    
+		Timer timer1 = new Timer();
+		
+    	if (MainActivity.storage_time == 1)
     	{
-	    	timer.schedule( new TimerTask()
-	    						{          
-	    							@Override
-	    							public void run() 
-	    							{
-	    								delete();
-	    							}
-	    						}
-	    					, 0, MainActivity.storage_time );
+    		timer1.schedule( new TimerTask()
+    		{          
+    			@Override
+    			public void run() 
+    			{
+    				delete();
+    			}
+    		}
+    		, 0, MainActivity.storage_time * 86400000);
+    	}
+    	else
+    	{
+    		timer1.schedule( new TimerTask()
+    		{          
+    			@Override
+    			public void run() 
+    			{
+    				delete();
+    			}
+    		}
+    		, MainActivity.storage_time/2 * 43200000, MainActivity.storage_time/2 * 43200000);
+    	}
+    	
+    	Timer timer2 = new Timer();
+    	
+    	if (MainActivity.update_time == 1)
+    	{
+    		timer2.schedule( new TimerTask()
+    		{          
+    			@Override
+    			public void run() 
+    			{
+    				update();
+    			}
+    		}
+    		, 0, MainActivity.update_time * 3600000);
+    	}
+    	else
+    	{
+    		timer2.schedule( new TimerTask()
+    		{          
+    			@Override
+    			public void run() 
+    			{
+    				update();
+    			}
+    		}
+    		, MainActivity.update_time/2 * 1800000, MainActivity.update_time/2 * 1800000);
     	}
     	
     	Intent intent = new Intent(main.this , MainActivity.class);

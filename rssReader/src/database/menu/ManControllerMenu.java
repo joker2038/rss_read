@@ -68,7 +68,7 @@ public class ManControllerMenu
 		ManControllerMenu.maxRowsInNames = maxRowsInNames;
 	}
 	
-	public static void update_title_font(Context context, String comment, long l) 
+	public static void update(Context context, String NamesColumns, String comment, long l) 
 	{
 		try 
 		{
@@ -87,112 +87,7 @@ public class ManControllerMenu
 				}
 			}
 			cursor.close();
-			quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns._TITLE_FONT	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
-			Log.d("", "" + quer);
-			sqliteDB.execSQL(quer);
-			sqliteDB.close();
-			dbhelper.close();
-		} 
-		catch (SQLiteException e)
-		{
-			Log.e(TAG, "Failed open database. ", e);
-		} 
-		catch (SQLException e) 
-		{
-			Log.e(TAG, "Failed to update Names. ", e);
-		}
-	}
-
-	public static void update_news_font(Context context, String comment, long l) 
-	{
-		try 
-		{
-			DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(context);
-			SQLiteDatabase sqliteDB = dbhelper.getWritableDatabase();
-			String quer = null;
-			int countRows = -1;
-			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, null);
-			
-			if (cursor.moveToFirst()) 
-			{
-				countRows = cursor.getInt(0);
-				if (LOGV) 
-				{
-					Log.v(TAG, "Count in Names table" + String.valueOf(countRows));
-				}
-			}
-			cursor.close();
-			quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns._NEWS_FONT	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
-			Log.d("", "" + quer);
-			sqliteDB.execSQL(quer);
-			sqliteDB.close();
-			dbhelper.close();
-		} 
-		catch (SQLiteException e)
-		{
-			Log.e(TAG, "Failed open database. ", e);
-		} 
-		catch (SQLException e) 
-		{
-			Log.e(TAG, "Failed to update Names. ", e);
-		}
-	}
-
-	public static void update_channel_list_font(Context context, String comment, long l) 
-	{
-		try 
-		{
-			DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(context);
-			SQLiteDatabase sqliteDB = dbhelper.getWritableDatabase();
-			String quer = null;
-			int countRows = -1;
-			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, null);
-			
-			if (cursor.moveToFirst()) 
-			{
-				countRows = cursor.getInt(0);
-				if (LOGV) 
-				{
-					Log.v(TAG, "Count in Names table" + String.valueOf(countRows));
-				}
-			}
-			cursor.close();
-			quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns._CHANNAL_LIST_FONT	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
-			Log.d("", "" + quer);
-			sqliteDB.execSQL(quer);
-			sqliteDB.close();
-			dbhelper.close();
-		} 
-		catch (SQLiteException e)
-		{
-			Log.e(TAG, "Failed open database. ", e);
-		} 
-		catch (SQLException e) 
-		{
-			Log.e(TAG, "Failed to update Names. ", e);
-		}
-	}
-	
-	public static void update_storage_time(Context context, String comment, long l) 
-	{
-		try 
-		{
-			DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(context);
-			SQLiteDatabase sqliteDB = dbhelper.getWritableDatabase();
-			String quer = null;
-			int countRows = -1;
-			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, null);
-			
-			if (cursor.moveToFirst()) 
-			{
-				countRows = cursor.getInt(0);
-				if (LOGV) 
-				{
-					Log.v(TAG, "Count in Names table" + String.valueOf(countRows));
-				}
-			}
-			cursor.close();
-			quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns._STORAGE_TIME	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+			quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + NamesColumns	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
 			Log.d("", "" + quer);
 			sqliteDB.execSQL(quer);
 			sqliteDB.close();

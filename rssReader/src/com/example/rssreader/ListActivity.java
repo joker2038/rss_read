@@ -28,8 +28,7 @@ public class ListActivity extends Activity
 {	
 	final Context context = this;
 	String[] urllink;
-	int rowId = 0;
-	String[][] data = null;
+	int rowId = 0;	
 	ArrayAdapter<String> adapter = null;
 	//טלÿ באחû
 	public static String BAZA_NAME = "";
@@ -47,28 +46,28 @@ public class ListActivity extends Activity
 		if (c != null)
 		{
 			int iNew = -1;
-			data = new String[3][c.getCount()];
+			MainActivity.data = new String[3][c.getCount()];
 		    while(c.moveToNext()) 
 		    {		  
 		    	iNew++;
-		    	data[0][iNew] = c.getString(0);
-		        data[1][iNew] = c.getString(1);
-		        data[2][iNew] = c.getString(2);
+		    	MainActivity.data[0][iNew] = c.getString(0);
+		        MainActivity.data[1][iNew] = c.getString(1);
+		        MainActivity.data[2][iNew] = c.getString(2);
 		    }
 		    c.close();
 		}
 				
 		if (MainActivity.channel_list_font == 10)
         {
-			adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data[2]);
+			adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, MainActivity.data[2]);
         }
         else if (MainActivity.channel_list_font == 20)
         {
-        	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data[2]);
+        	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, MainActivity.data[2]);
         }
         else
         {
-        	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data[2]);
+        	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, MainActivity.data[2]);
         }
 		
 		final ListView lv = (ListView) findViewById(R.id.listView1);				
@@ -80,10 +79,10 @@ public class ListActivity extends Activity
 			@Override
 			public void onItemClick(AdapterView<?> a, View v, int position, long id) 
 			{
-				BAZA_NAME = data[2][position].replace( " ", "" );
+				BAZA_NAME = MainActivity.data[2][position].replace( " ", "" );
 				Intent intent = new Intent(ListActivity.this, AndroidRSSReader.class);	
-				intent.putExtra("urlLink", data[1][position]);
-				intent.putExtra("name", data[2][position]);
+				intent.putExtra("urlLink", MainActivity.data[1][position]);
+				intent.putExtra("name", MainActivity.data[2][position]);
 				startActivity(intent);
 			}
 		});
@@ -106,7 +105,7 @@ public class ListActivity extends Activity
 									{										
 										DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 										SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-										ManController.delete(getBaseContext(), Long.parseLong(data[0][pos]));	
+										ManController.delete(getBaseContext(), Long.parseLong(MainActivity.data[0][pos]));	
 										dbhelper.close();
 										sqliteDB.close();
 										Intent intent = getIntent();
@@ -123,7 +122,7 @@ public class ListActivity extends Activity
 										// הוכאול ודמ הטאכמדמל
 										alertDialogBuilder.setView(promptsView);
 										final EditText userInput = (EditText) promptsView.findViewById(R.id.newNameEditText);
-										userInput.setText(data[1][pos]);
+										userInput.setText(MainActivity.data[1][pos]);
 										// גוראול םא םודמ סמבûעטו
 										alertDialogBuilder.setCancelable(false).setPositiveButton("OK",	new DialogInterface.OnClickListener() 
 												{
@@ -132,7 +131,7 @@ public class ListActivity extends Activity
 													{
 														DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 														SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-														ManController.update(getBaseContext(), userInput.getText().toString(), Long.parseLong(data[0][pos]));		
+														ManController.update(getBaseContext(), userInput.getText().toString(), Long.parseLong(MainActivity.data[0][pos]));		
 														dbhelper.close();
 														sqliteDB.close();
 														Intent intent = getIntent();

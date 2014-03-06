@@ -19,8 +19,11 @@
     <string name="font_size_of_the_channel_list">размер шрифта списка каналов</string>
     <string name="storage_news">хранение новости</string>
     <string name="history_hint">установите ноль чтобы не удалять историю или введите срок хранения</string>
+    <string name="history_update">установите ноль чтобы не обновлять автоматически новости или введите период обнавления</string>
     <string name="Day">Дней</string>
     <string name="plus">+</string>
     <string name="minus">-</string>
+    <string name="update_news">обнавление новостей</string>
+    <string name="hour">часов</string>
 
 </resources>

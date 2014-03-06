@@ -14,6 +14,7 @@ public class DatabaseContractMenu
 		private String news_font;
 		private String channel_list_font;
 		private String storage_time;
+		private String update_time;
 		private long id;		
 		
         // Ќиже идут сетеры и гетеры дл€ захвата данных из базы
@@ -36,6 +37,11 @@ public class DatabaseContractMenu
 		public String get_storage_time() 
 		{
 			return storage_time;
+		}
+		
+		public String get_update_time() 
+		{
+			return update_time;
 		}
 
 		public long getId()
@@ -62,7 +68,11 @@ public class DatabaseContractMenu
 		{
 			this.storage_time = storage_time;
 		}
-
+		
+		public void set_update_time(String update_time) 
+		{
+			this.update_time = update_time;
+		}
 
 		public void setId(long id) 
 		{
@@ -76,6 +86,7 @@ public class DatabaseContractMenu
 			public static final String _NEWS_FONT = "news_font";
 			public static final String _CHANNAL_LIST_FONT = "channel_list_font";
 			public static final String _STORAGE_TIME = "storage_time";
+			public static final String _UPDATE_TIME = "update_time";
 			public static final String _ID = "_id";
 		}
 	}

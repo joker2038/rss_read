@@ -237,14 +237,14 @@ public class AndroidRSSReader extends Activity
 		
 	}
 
-	private void refressRssList() 
+	public void refressRssList() 
 	{		
 		ArrayList<RssItem> newItems = RssItem.getRssItems(feedUrl);
 		
 		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
 		Cursor cursor1 = null;
-		cursor1 = sqliteDB.query(Names.TABLE_NAME, new String[] {"max(" + Names.NamesColumns.PUPDATE + ")"}, null, null, null, null, null);
+		cursor1 = sqliteDB.query("feed", new String[] {"max(" + Names.NamesColumns.PUPDATE + ")"}, null, null, null, null, null);
         String str = "0";
 		if (cursor1 != null)
 		{
