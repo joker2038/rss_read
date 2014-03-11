@@ -20,7 +20,8 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import database.DatabaseContract.Names;
+import database.DatabaseContract.NamesFeed;
+import database.DatabaseContract.NamesFeedList;
 import database.DatabaseOpenHelper;
 import database.ManController;
 
@@ -30,8 +31,6 @@ public class ListActivity extends Activity
 	String[] urllink;
 	int rowId = 0;	
 	ArrayAdapter<String> adapter = null;
-	//имя базы
-	public static String BAZA_NAME = "";
 		
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -41,7 +40,7 @@ public class ListActivity extends Activity
 				
 		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-		final Cursor c = sqliteDB.query(Names.TABLE_NAME, null, null, null, null, null, Names.DEFAULT_SORT);
+		final Cursor c = sqliteDB.query(NamesFeedList.TABLE_NAME, null, null, null, null, null, NamesFeedList.DEFAULT_SORT);
 				
 		if (c != null)
 		{
@@ -79,8 +78,8 @@ public class ListActivity extends Activity
 			@Override
 			public void onItemClick(AdapterView<?> a, View v, int position, long id) 
 			{
-				BAZA_NAME = MainActivity.data[2][position].replace( " ", "" );
 				Intent intent = new Intent(ListActivity.this, AndroidRSSReader.class);	
+				intent.putExtra("id", MainActivity.data[0][position]);
 				intent.putExtra("urlLink", MainActivity.data[1][position]);
 				intent.putExtra("name", MainActivity.data[2][position]);
 				startActivity(intent);
@@ -105,7 +104,8 @@ public class ListActivity extends Activity
 									{										
 										DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 										SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-										ManController.delete(getBaseContext(), Long.parseLong(MainActivity.data[0][pos]));	
+										sqliteDB.delete(NamesFeed.TABLE_NAME, NamesFeed.NamesColumns.NAMBER + " = " + MainActivity.data[0][pos], null);
+										ManController.delete(getBaseContext(), Long.parseLong(MainActivity.data[0][pos]));											
 										dbhelper.close();
 										sqliteDB.close();
 										Intent intent = getIntent();

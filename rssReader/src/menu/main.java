@@ -1,6 +1,5 @@
 package menu;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,8 +9,6 @@ import java.util.TimerTask;
 
 import rssfeed.RssItem;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,12 +19,11 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.example.rssreader.ListActivity;
 import com.example.rssreader.MainActivity;
 import com.example.rssreader.R;
 
-import database.feed.DatabaseContractFeed;
-import database.feed.DatabaseOpenHelperFeed;
+import database.DatabaseContract.NamesFeed;
+import database.DatabaseOpenHelper;
 import database.feed.ManControllerFeed;
 import database.menu.DatabaseContractMenu.Names;
 import database.menu.DatabaseOpenHelperMenu;
@@ -166,13 +162,6 @@ public class main  extends Activity
         	gr2_rad2.setChecked(true);
         }
         
-        //удалить все базы
-        Button all = (Button) findViewById(R.id.all);
-        //удалить одну базу
-        Button one = (Button) findViewById(R.id.one);
-              
-        // title_font
-        
         //gr0 раз
         gr0_rad0.setOnClickListener(new OnClickListener() 
         {
@@ -301,114 +290,38 @@ public class main  extends Activity
 				dbhelper.close();
 				sqliteDB.close();
 			}
-        });
-    
-        // удалить все базы
-        all.setOnClickListener(new OnClickListener() 
-        {
-        	@Override
-			public void onClick(View arg0) 
-			{  
-        		File []fList;        
-        		File F = new File("data/data/com.example.rssreader/databases/");
-        		        
-        		fList = F.listFiles();
-        		                
-        		for(int i=0; i<fList.length; i++)           
-        		{
-        		     //Нужны только папки в место isFile() пишим isDirectory()
-        		     if (fList[i].isFile() && !fList[i].getName().equals("setting.db") && !fList[i].getName().equals("FeedList.db") && !fList[i].getName().matches(".*-journal"))
-        		     { 
-        		    	 fList[i].delete();  
-        		     }
-        		}
-			}
-        });
-    
-        // удалить одну базу
-        one.setOnClickListener(new OnClickListener() 
-        {
-    		File []fList;        
-    		File F = new File("data/data/com.example.rssreader/databases/");
-    		int[] nomer;
-        	@Override
-			public void onClick(View arg0) 
-			{          		        
-        		fList = F.listFiles();
-        		nomer = new int[fList.length];
-        		int temp123 = 0;
-        		//final CharSequence[] items = { };
-        		ArrayList<String> massiv = new ArrayList<String>();
-        		
-        		for(int i=0; i<fList.length; i++)           
-        		{
-        		     //Нужны только папки в место isFile() пишим isDirectory()
-        			if (fList[i].isFile() && !fList[i].getName().equals("setting.db") && !fList[i].getName().equals("FeedList.db") && !fList[i].getName().matches(".*-journal"))
-       		     	{        		           	 
-        				massiv.add(fList[i].getName());  
-        				nomer[temp123] = i;
-        				temp123++;
-        		     }
-        		}
-        		
-        		final CharSequence[] items = massiv.toArray(new CharSequence[massiv.size()]);;
-        		
-				AlertDialog.Builder builder3 = new AlertDialog.Builder(main.this);
-				builder3.setTitle("Выберите базу").setItems(items, new DialogInterface.OnClickListener() 
-				{
-							@Override
-							public void onClick(DialogInterface dialog, int item) 
-							{
-								fList[nomer[item]].delete();
-							}
-						});
-				builder3.show();
-			}
         });    
     }
    
     public void delete() 
 	{
-    	File []fList;        
-		File F = new File("data/data/com.example.rssreader/databases/");
-    	fList = F.listFiles();
-		for(int i=0; i<fList.length; i++)           
-		{
-		     //Нужны только папки в место isFile() пишим isDirectory()
-		     if (fList[i].isFile() && !fList[i].getName().equals("setting.db") && !fList[i].getName().equals("FeedList.db") && !fList[i].getName().matches(".*-journal") )
-		     {   
-		    	 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
-		    	 Calendar Current_Calendar = Calendar.getInstance();
-		    	 Date Current_Date = Current_Calendar.getTime();
-		    	 long dateTemp = 0;
-		    	 String dateNow = sdf.format(Current_Date);
-		    	 ListActivity.BAZA_NAME = fList[i].getName().replace(".db", "");  
-		    	 DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
-		    	 SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
-		    	 dateTemp = Long.parseLong(dateNow) - MainActivity.storage_time * 1000000 ;
-		    	 ManControllerFeed.delete(getBaseContext(), dateTemp);	
-		    	 dbhelper.close();
-		    	 sqliteDB.close();
-		     }
-		}
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+		Calendar Current_Calendar = Calendar.getInstance();
+		Date Current_Date = Current_Calendar.getTime();
+		long dateTemp = 0;
+		String dateNow = sdf.format(Current_Date);
+		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
+		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
+		dateTemp = Long.parseLong(dateNow) - MainActivity.storage_time * 1000000 ;
+		ManControllerFeed.delete(getBaseContext(), dateTemp);	
+		dbhelper.close();
+		sqliteDB.close();
+		
 		flagTimer1 = false;
 	}
      
     public void update() 
 	{    		
     	for (int j = 0; j < MainActivity.data[0].length; j++)
-    	{
-    		ListActivity.BAZA_NAME = "";
-    		ListActivity.BAZA_NAME = MainActivity.data[2][j].replace(" ", "");
-    		
+    	{    		
     		ArrayList<RssItem> newItems = new ArrayList<RssItem>();
     		newItems.clear();
     		newItems = RssItem.getRssItems(MainActivity.data[1][j]);
     	
-    		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+    		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
     		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
     		Cursor cursor1 = null;
-    		cursor1 = sqliteDB.query(DatabaseContractFeed.Names.TABLE_NAME, new String[] {"max(" + DatabaseContractFeed.Names.NamesColumns.PUPDATE + ")"}, null, null, null, null, null);
+    		cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] {"max(" + NamesFeed.NamesColumns.PUPDATE + ")"}, NamesFeed.NamesColumns.NAMBER + " = ?",  new String[] { MainActivity.data[0][j] }, null, null, null);
     		String str = "0";
     		if (cursor1 != null)
     		{
@@ -429,8 +342,8 @@ public class main  extends Activity
     	
     		for (int i = 0; i < newItems.size(); i++)
     		{
-    			ManControllerFeed.write(getBaseContext(), '"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str);
-    		}
+    			ManControllerFeed.write(getBaseContext(), MainActivity.data[0][j],'"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str, "no_favorites");
+	    	}
     	}
     	flagTimer2 = false;
 	}     

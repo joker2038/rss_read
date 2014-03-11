@@ -23,23 +23,22 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.example.rssreader.ListActivity;
 import com.example.rssreader.MainActivity;
 import com.example.rssreader.R;
 
-import database.feed.DatabaseContractFeed.Names;
-import database.feed.DatabaseContractFeed;
-import database.feed.DatabaseOpenHelperFeed;
+import database.DatabaseContract.NamesFeed;
+import database.DatabaseOpenHelper;
 import database.feed.ManControllerFeed;
+
 
 public class AndroidRSSReader extends Activity 
 {
 	public static RssItem selectedRssItem = null;
 	String feedUrl = "";
+	String id = "";	
 	ListView rssListViewUnread = null;
 	ListView rssListViewRead = null;
-	ListView rssListViewFavorites = null;	
-	ArrayList<RssItem> rssItems = new ArrayList<RssItem>();
+	ListView rssListViewFavorites = null;
 	ArrayAdapter<RssItem> aa = null;
 	String[][] data1;
 	String[][] data2;
@@ -48,7 +47,7 @@ public class AndroidRSSReader extends Activity
 	ArrayAdapter<String> adapter2 = null;
 	ArrayAdapter<String> adapter3 = null;
 	
-	public static final int RssItemDialog = 1;
+	public static final int RssItemDialog = 1;	
 
 	/** Called when the activity is first created. */
 	@Override
@@ -91,15 +90,15 @@ public class AndroidRSSReader extends Activity
 	    // первая вкладка будет выбрана по умолчанию
         tabHost.setCurrentTabByTag("tag1");
         
-        // обработчик переключения вкладок
-        //tabHost.setOnTabChangedListener(new OnTabChangeListener() 
-        //{
-        //	public void onTabChanged(String tabId) 
-        //	{
-        //		Toast.makeText(getBaseContext(), "tabId = " + tabId, Toast.LENGTH_SHORT).show();
-        //	}
-        //});
-
+        /* обработчик переключения вкладок
+        tabHost.setOnTabChangedListener(new OnTabChangeListener() 
+        {
+        	public void onTabChanged(String tabId) 
+        	{
+        		Toast.makeText(getBaseContext(), "tabId = " + tabId, Toast.LENGTH_SHORT).show();
+        	}
+        });*/
+      
 		rssListViewUnread = (ListView) findViewById(R.id.rssListViewUnread);
 		rssListViewRead = (ListView) findViewById(R.id.rssListViewRead);
 		rssListViewFavorites = (ListView) findViewById(R.id.rssListViewFavorites);
@@ -107,6 +106,7 @@ public class AndroidRSSReader extends Activity
 		TextView label = (TextView) findViewById(R.id.label);
 		label.setTextSize(MainActivity.title_font);
 		
+		id = getIntent().getStringExtra("id").toString();
 		feedUrl = getIntent().getStringExtra("urlLink").toString();
 		label.setText(getIntent().getStringExtra("name").toString());
 		
@@ -156,9 +156,9 @@ public class AndroidRSSReader extends Activity
 								{
 									case 0: 
 									{										
-										DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+										DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 										SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-										Cursor cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data3[0][pos] }, null, null, null);
+										Cursor cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data3[0][pos] }, null, null, null);
 										String str0 = null;
 										if (cursor1 != null)
 										{
@@ -168,7 +168,7 @@ public class AndroidRSSReader extends Activity
 											}
 											cursor1.close();
 										}
-										ManControllerFeed.update(getBaseContext(), " ", Long.parseLong(str0));												
+										ManControllerFeed.update(getBaseContext(), "no_favorites", Long.parseLong(str0));												
 										dbhelper.close();
 										sqliteDB.close();
 										Intent intent = getIntent();
@@ -200,7 +200,7 @@ public class AndroidRSSReader extends Activity
 								{
 									case 0: 
 									{										
-										addToFavorites(pos, "unread");
+										addToFavorites(data1[0][pos], "favorites");
 									}
 										break;
 								}
@@ -227,7 +227,7 @@ public class AndroidRSSReader extends Activity
 								{
 									case 0: 
 									{										
-										addToFavorites(pos, "read");
+										addToFavorites(data2[0][pos], "favorites");
 									}
 										break;
 								}
@@ -243,17 +243,14 @@ public class AndroidRSSReader extends Activity
 		imageButton1.setOnClickListener(new View.OnClickListener() 
 		{
 		    public void onClick(View v) 
-		    {
-		    	ListActivity.BAZA_NAME = getIntent().getStringExtra("name").toString();
-	    		
+		    {	    		
 	    		ArrayList<RssItem> newItems = new ArrayList<RssItem>();
-	    		newItems.clear();
 	    		newItems = RssItem.getRssItems(feedUrl);
 	    	
-	    		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+	    		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 	    		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
 	    		Cursor cursor1 = null;
-	    		cursor1 = sqliteDB.query(DatabaseContractFeed.Names.TABLE_NAME, new String[] {"max(" + DatabaseContractFeed.Names.NamesColumns.PUPDATE + ")"}, null, null, null, null, null);
+	    		cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] {"max(" + NamesFeed.NamesColumns.PUPDATE + ")"}, NamesFeed.NamesColumns.NAMBER + " = ?",  new String[] { id }, null, null, null);
 	    		String str = "0";
 	    		if (cursor1 != null)
 	    		{
@@ -274,7 +271,7 @@ public class AndroidRSSReader extends Activity
 	    	
 	    		for (int i = 0; i < newItems.size(); i++)
 	    		{
-	    			ManControllerFeed.write(getBaseContext(), '"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str);
+	    			ManControllerFeed.write(getBaseContext(), id ,'"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str, "no_favorites");
 	    		}
 	    		refressRssList();
 		    }
@@ -285,50 +282,56 @@ public class AndroidRSSReader extends Activity
 	public void refressRssList() 
 	{		
 		
-		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
+		
+		String unread = "unread";
+		String read = "read";
+		String favorites = "favorites";
+		String noFavorites = "no_favorites";
 
-		final Cursor c1 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.READ + " = ?", new String[] { "unread" }, null, null, Names.DEFAULT_SORT);
+		final Cursor CursorUnread = sqliteDB.query(NamesFeed.TABLE_NAME, null, NamesFeed.NamesColumns.READ + " = ? and " + NamesFeed.NamesColumns.NAMBER + " = ? and " + NamesFeed.NamesColumns.FAVORITES + " = ?", new String[] { unread, id, noFavorites }, null, null, NamesFeed.DEFAULT_SORT);
+		final Cursor CursorRead = sqliteDB.query(NamesFeed.TABLE_NAME, null, NamesFeed.NamesColumns.READ + " = ? and " + NamesFeed.NamesColumns.NAMBER + " = ? and " + NamesFeed.NamesColumns.FAVORITES + " = ?", new String[] { read, id, noFavorites }, null, null, NamesFeed.DEFAULT_SORT);
+		final Cursor CursorFavorites = sqliteDB.query(NamesFeed.TABLE_NAME, null, NamesFeed.NamesColumns.FAVORITES + " = ? and " + NamesFeed.NamesColumns.NAMBER + " = ?", new String[] { favorites, id }, null, null, NamesFeed.DEFAULT_SORT);
 		
-		if (c1 != null)
+		if (CursorUnread != null)
 		{
-			int iNew = -1;
-			data1 = new String[1][c1.getCount()];
-		    while(c1.moveToNext()) 
-		    {		  
-		    	iNew++;
-		        data1[0][iNew] = c1.getString(1);	        
+			int iNew1 = -1;
+			data1 = new String[1][CursorUnread.getCount()];
+		    while(CursorUnread.moveToNext()) 
+		    {
+		    	iNew1++;
+		    	data1[0][iNew1] = CursorUnread.getString(1);	    
 		    }
-		    c1.close();
+		}		
+
+		CursorUnread.close();
+		
+		if (CursorRead != null)
+		{
+			int iNew2 = -1;
+			data2 = new String[1][CursorRead.getCount()];
+		    while(CursorRead.moveToNext()) 
+		    {
+		    	iNew2++;
+		    	data2[0][iNew2] = CursorRead.getString(1);	    
+		    }
 		}
 		
-		final Cursor c2 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.READ + " = ?", new String[] { "read" }, null, null, Names.DEFAULT_SORT);
+		CursorRead.close();
 		
-		if (c2 != null)
+		if (CursorFavorites != null)
 		{
-			int iNew = -1;
-			data2 = new String[1][c2.getCount()];
-		    while(c2.moveToNext()) 
-		    {		  
-		    	iNew++;
-		        data2[0][iNew] = c2.getString(1);		        
+			int iNew3 = -1;
+			data3 = new String[1][CursorFavorites.getCount()];
+		    while(CursorFavorites.moveToNext()) 
+		    {
+		    	iNew3++;
+		    	data3[0][iNew3] = CursorFavorites.getString(1);	    
 		    }
-		    c2.close();
-		}
+		}	
 		
-		final Cursor c3 = sqliteDB.query(Names.TABLE_NAME, null, Names.NamesColumns.FAVORITES + " = ?", new String[] { "favorites" }, null, null, Names.DEFAULT_SORT);
-		
-		if (c3 != null)
-		{
-			int iNew = -1;
-			data3 = new String[1][c3.getCount()];
-		    while(c3.moveToNext()) 
-		    {		  
-		    	iNew++;
-		        data3[0][iNew] = c3.getString(1);	        
-		    }
-		    c3.close();
-		}
+		CursorFavorites.close();
 		
 		if (MainActivity.channel_list_font == 10)
         {
@@ -364,20 +367,20 @@ public class AndroidRSSReader extends Activity
 	private void open(int index, String temp)
 	{
 		//обновление прочитого
-		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
 		Cursor cursor1 = null;
 		if(temp.equals("read"))
 		{
-			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][index] }, null, null, null);
+			cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][index] }, null, null, null);
 		}
 		else if (temp.equals("favorites"))
 		{
-			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data3[0][index] }, null, null, null);
+			cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data3[0][index] }, null, null, null);
 		}
 		else if (temp.equals("unread"))
 		{
-			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][index] }, null, null, null);
+			cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][index] }, null, null, null);
 		}
 		String str0 = null;
 		String str1 = null;
@@ -409,19 +412,14 @@ public class AndroidRSSReader extends Activity
 		startActivity(intent);
 	}
 	
-	private void addToFavorites(int pos,String temp)
+	private void addToFavorites(String pos,String temp)
 	{
-		DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(getBaseContext());
+		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
 		Cursor cursor1 = null;
-		if (temp.equals("unread"))
-		{
-			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][pos] }, null, null, null);
-		}
-		else if (temp.equals("read"))
-		{
-			cursor1 = sqliteDB.query(Names.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][pos] }, null, null, null);
-		}
+		
+		cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { pos }, null, null, null);
+		
 		String str0 = null;
 		if (cursor1 != null)
 		{

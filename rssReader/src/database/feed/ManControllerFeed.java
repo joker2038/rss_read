@@ -10,8 +10,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.provider.BaseColumns;
 import android.util.Log;
-import database.feed.DatabaseContractFeed.Names;
-import database.feed.DatabaseContractFeed.Names.NamesColumns;
+import database.DatabaseContract.NamesFeed;
+import database.DatabaseContract.NamesFeed.NamesColumns;
+import database.DatabaseOpenHelper;
 
 public class ManControllerFeed {
 
@@ -28,25 +29,25 @@ public class ManControllerFeed {
 		return maxRowsInNames;
 	}
 	
-	public static ArrayList<Names> readNames(Context context) 
+	public static ArrayList<NamesFeed> readNames(Context context) 
 	{
-		ArrayList<Names> list = null;
+		ArrayList<NamesFeed> list = null;
 		try 
 		{
-			DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(context);
+			DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(context);
 			SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
 			String[] columnsToTake = { BaseColumns._ID, NamesColumns.TITLE, NamesColumns.DESCRIPTION, NamesColumns.LINK, NamesColumns.PUPDATE };
-			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, columnsToTake, null, null, null, null, Names.DEFAULT_SORT);
+			Cursor cursor = sqliteDB.query(NamesFeed.TABLE_NAME, columnsToTake, null, null, null, null, NamesFeed.DEFAULT_SORT);
 			//sqliteDB.execSQL("SELECT * FROM feed ORDER BY _id DESC");
 			
 			if (cursor.moveToFirst())
 			{
-				list = new ArrayList<Names>();
+				list = new ArrayList<NamesFeed>();
 			}
 			
 			while (cursor.moveToNext())
 			{
-				Names oneRow = new Names();
+				NamesFeed oneRow = new NamesFeed();
 				oneRow.setId(cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)));
 				oneRow.setTITLE(cursor.getString(cursor.getColumnIndexOrThrow(NamesColumns.TITLE)));
 				oneRow.setDESCRIPTION(cursor.getString(cursor.getColumnIndexOrThrow(NamesColumns.DESCRIPTION)));
@@ -59,7 +60,7 @@ public class ManControllerFeed {
 		} 
 		catch (Exception e)
 		{
-			Log.e(TAG, "Failed to select Names.", e);
+			Log.e(TAG, "Failed to select NamesFeed.", e);
 		}
 		return list;
 	}
@@ -73,32 +74,32 @@ public class ManControllerFeed {
 	{
 		try 
 		{
-			DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(context);
+			DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(context);
 			SQLiteDatabase sqliteDB = dbhelper.getWritableDatabase();
 			String quer = null;
 			int countRows = -1;
-			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, Names.DEFAULT_SORT);
+			Cursor cursor = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, NamesFeed.DEFAULT_SORT);
 			
 			if (cursor.moveToFirst()) 
 			{
 				countRows = cursor.getInt(0);
 				if (LOGV) 
 				{
-					Log.v(TAG, "Count in Names table" + String.valueOf(countRows));
+					Log.v(TAG, "Count in NamesFeed table" + String.valueOf(countRows));
 				}
 			}
 			cursor.close();
-			if (comment.equals(" "))
+			if (comment.equals("no_favorites"))
 			{
-				quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns.FAVORITES	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+				quer = String.format("UPDATE " + NamesFeed.TABLE_NAME + " SET " + NamesFeed.NamesColumns.FAVORITES	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
 			}
 			else if (comment.equals("favorites"))
 			{
-				quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns.FAVORITES	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+				quer = String.format("UPDATE " + NamesFeed.TABLE_NAME + " SET " + NamesFeed.NamesColumns.FAVORITES	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
 			}
 			else if (comment.equals("read"))
 			{
-				quer = String.format("UPDATE " + Names.TABLE_NAME + " SET " + Names.NamesColumns.READ	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
+				quer = String.format("UPDATE " + NamesFeed.TABLE_NAME + " SET " + NamesFeed.NamesColumns.READ	+ " = '" + comment + "' WHERE " + BaseColumns._ID + " = " + l);
 			}
 			Log.d("", "" + quer);
 			sqliteDB.execSQL(quer);
@@ -111,29 +112,29 @@ public class ManControllerFeed {
 		} 
 		catch (SQLException e) 
 		{
-			Log.e(TAG, "Failed to update Names. ", e);
+			Log.e(TAG, "Failed to update NamesFeed. ", e);
 		}
 	}
 	
-	public static void write(Context context, String title, String description, String pubDate, String link, String read, String str)
+	public static void write(Context context, String id, String title, String description, String pubDate, String link, String read, String str, String no_favorites)
 	{
 		try 
 		{
 			//создали нашу базу и открыли для записи
-			DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(context);
+			DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(context);
 			SQLiteDatabase sqliteDB = dbhelper.getWritableDatabase();
 			String quer = null;
 			boolean temp = false;
 			int countRows = -1;
 			//Открыли курсор для записи
-			Cursor cursor = sqliteDB.query(Names.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, null);	
+			Cursor cursor = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] { "count(*)" }, null, null, null, null, null);	
 			
 			if (cursor.moveToFirst()) 
 			{
 				countRows = cursor.getInt(0);				
 				if (LOGV)
 				{
-					Log.v(TAG, "Count in Names table" + String.valueOf(countRows));
+					Log.v(TAG, "Count in NamesFeed table" + String.valueOf(countRows));
 				}
 			}
 			long i1 = Long.parseLong(str);
@@ -154,21 +155,25 @@ public class ManControllerFeed {
 				{
 					countRows = cursor.getInt(0);
 					//дальще наш запрос в базу для записи полученных дынных из функции
-					quer = String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (%s, %s, %s, %s, %s);",
+					quer = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s) VALUES (%s, %s, %s, %s, %s, %s, %s);",
 							// таблица
-							Names.TABLE_NAME,
+							NamesFeed.TABLE_NAME,
 							// колонки
-							Names.NamesColumns.TITLE,
-							Names.NamesColumns.DESCRIPTION,
-							Names.NamesColumns.PUPDATE,
-							Names.NamesColumns.LINK,
-							Names.NamesColumns.READ,
-							// поля
+							NamesFeed.NamesColumns.TITLE,
+							NamesFeed.NamesColumns.DESCRIPTION,
+							NamesFeed.NamesColumns.PUPDATE,
+							NamesFeed.NamesColumns.LINK,
+							NamesFeed.NamesColumns.READ,
+							NamesFeed.NamesColumns.FAVORITES,
+							NamesFeed.NamesColumns.NAMBER,
+							// поля							
 							"\"" + title + "\"",
 							"\"" + description + "\"",
 							pubDate,
 							link,
-							read);
+							read,
+							"\"" + no_favorites + "\"",
+							id);
 					temp = true;
 				}		
 			}
@@ -187,15 +192,15 @@ public class ManControllerFeed {
 		} 
 		catch (SQLException e) 
 		{
-			Log.e(TAG, "Failed to insert Names. ", e);
+			Log.e(TAG, "Failed to insert NamesFeed. ", e);
 		}
 	}
 
 	public static void delete(Context context, long l) 
 	{
-			DatabaseOpenHelperFeed dbhelper = new DatabaseOpenHelperFeed(context);
+			DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(context);
 			SQLiteDatabase sqliteDB = dbhelper.getWritableDatabase();
-			sqliteDB.delete(Names.TABLE_NAME, Names.NamesColumns.PUPDATE  + " <= " + l, null);
+			sqliteDB.delete(NamesFeed.TABLE_NAME, NamesFeed.NamesColumns.PUPDATE  + " <= " + l, null);
 			sqliteDB.close();
 			dbhelper.close();
 	}

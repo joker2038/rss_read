@@ -4,17 +4,14 @@ package database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.BaseColumns;
-import android.util.Log;
-import database.DatabaseContract.Names;
+import database.DatabaseContract.NamesFeed;
+import database.DatabaseContract.NamesFeedList;
 
 /** Класс создающий, удаляющий и редактирующий базу */
 public class DatabaseOpenHelper extends SQLiteOpenHelper
 {
 	private static final String DATABASE_NAME = "FeedList.db";
 	private static final int DATABASE_VERSION = 1;
-	private static final String DEBUG_TAG = DatabaseOpenHelper.class.getSimpleName();
-	private static final boolean LOGV = false;
 
 	public DatabaseOpenHelper(Context context) 
 	{
@@ -27,26 +24,19 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper
 	 *            - object of SQLiteDatabase */
 	public void dropTables(SQLiteDatabase db) 
 	{
-		if (LOGV)
-		{
-			Log.d(DEBUG_TAG, "onDropTables called");
-		}
-		db.execSQL("DROP TABLE IF EXISTS " + Names.TABLE_NAME);
+		db.execSQL("DROP TABLE IF EXISTS " + NamesFeedList.TABLE_NAME); //список		
+		db.execSQL("DROP TABLE IF EXISTS " + NamesFeed.TABLE_NAME); //новости
 	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) 
 	{
-		if (LOGV) 
-		{
-			Log.v(DEBUG_TAG, "onCreate()");
-		}
-		db.execSQL("CREATE TABLE " + Names.TABLE_NAME + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , " + Names.NamesColumns.URL + " TEXT NOT NULL, " + Names.NamesColumns.NAME + " TEXT NOT NULL );");
+		db.execSQL("CREATE TABLE " + NamesFeedList.TABLE_NAME + " (" + NamesFeedList.NamesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , " + NamesFeedList.NamesColumns.URL + " TEXT NOT NULL, " + NamesFeedList.NamesColumns.NAME + " TEXT NOT NULL );"); //список
+		db.execSQL("CREATE TABLE " + NamesFeed.TABLE_NAME + " (" + NamesFeed.NamesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , " + NamesFeed.NamesColumns.TITLE + " TEXT NOT NULL , " + NamesFeed.NamesColumns.DESCRIPTION + " TEXT NOT NULL , " + NamesFeed.NamesColumns.PUPDATE + " INTEGER NOT NULL , " + NamesFeed.NamesColumns.LINK + " TEXT NOT NULL , " + NamesFeed.NamesColumns.READ + " TEXT NOT NULL , " + NamesFeed.NamesColumns.FAVORITES + " TEXT NOT NULL , " + NamesFeed.NamesColumns.NAMBER + " INTEGER NOT NULL );"); //новости
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
 	{
-		Log.d(DEBUG_TAG, "onUpgrade called");
 	}
 }

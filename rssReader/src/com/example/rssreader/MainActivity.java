@@ -12,8 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import database.DatabaseContract;
-import database.DatabaseContract.Names;
+import database.DatabaseContract.NamesFeedList;
 import database.DatabaseOpenHelper;
 import database.ManController;
 import database.menu.DatabaseContractMenu;
@@ -37,7 +36,7 @@ public class MainActivity  extends Activity
         
         DatabaseOpenHelper dbhelper1 = new DatabaseOpenHelper(getBaseContext());
 		SQLiteDatabase sqliteDB1 = dbhelper1.getReadableDatabase();
-		final Cursor c1 = sqliteDB1.query(DatabaseContract.Names.TABLE_NAME, null, null, null, null, null, Names.DEFAULT_SORT);
+		final Cursor c1 = sqliteDB1.query(NamesFeedList.TABLE_NAME, null, null, null, null, null, NamesFeedList.DEFAULT_SORT);
 				
 		if (c1 != null)
 		{
