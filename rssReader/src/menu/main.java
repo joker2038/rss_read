@@ -290,7 +290,7 @@ public class main  extends Activity
 				dbhelper.close();
 				sqliteDB.close();
 			}
-        });    
+        });     
     }
    
     public void delete() 
@@ -365,7 +365,7 @@ public class main  extends Activity
 	    		{          
 	    			@Override
 	    			public void run() 
-	    			{
+	    			{	    				
 	    				update();
 	    			}
 	    		}
@@ -426,4 +426,5 @@ public class main  extends Activity
     	Intent intent = new Intent(main.this , MainActivity.class);
 	    startActivity(intent);
     }
+
 }

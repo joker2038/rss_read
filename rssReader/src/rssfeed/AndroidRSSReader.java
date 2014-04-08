@@ -2,6 +2,7 @@ package rssfeed;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import menu.main;
 import android.app.Activity;
@@ -10,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,6 +48,7 @@ public class AndroidRSSReader extends Activity
 	ArrayAdapter<String> adapter1 = null;
 	ArrayAdapter<String> adapter2 = null;
 	ArrayAdapter<String> adapter3 = null;
+	MyTask mt;
 	
 	public static final int RssItemDialog = 1;	
 
@@ -243,42 +246,64 @@ public class AndroidRSSReader extends Activity
 		imageButton1.setOnClickListener(new View.OnClickListener() 
 		{
 		    public void onClick(View v) 
-		    {	    		
-	    		ArrayList<RssItem> newItems = new ArrayList<RssItem>();
-	    		newItems = RssItem.getRssItems(feedUrl);
-	    	
-	    		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
-	    		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
-	    		Cursor cursor1 = null;
-	    		cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] {"max(" + NamesFeed.NamesColumns.PUPDATE + ")"}, NamesFeed.NamesColumns.NAMBER + " = ?",  new String[] { id }, null, null, null);
-	    		String str = "0";
-	    		if (cursor1 != null)
-	    		{
-	    			if (cursor1.moveToFirst())
-	    			{
-	    				for (String cn : cursor1.getColumnNames())
-	    				{
-	    					if (cursor1.getString(cursor1.getColumnIndex(cn)) !=null )
-	    					{
-	    						str = cursor1.getString(cursor1.getColumnIndex(cn));
-	    					}	
-	    				}
-	    			}
-	    			cursor1.close();
-	    		}
-	    		
-	    		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
-	    	
-	    		for (int i = 0; i < newItems.size(); i++)
-	    		{
-	    			ManControllerFeed.write(getBaseContext(), id ,'"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str, "no_favorites");
-	    		}
-	    		refressRssList();
+		    {	  
+		    	mt = new MyTask();
+		        mt.execute();
 		    }
 		});
 		
 	}
 
+	class MyTask extends AsyncTask<Void, Void, Void> 
+	{
+		@Override
+	    protected void onPreExecute() 
+	    {
+	      super.onPreExecute();
+	    }
+
+	    @Override
+	    protected Void doInBackground(Void... params) 
+	    {
+	    	ArrayList<RssItem> newItems = new ArrayList<RssItem>();
+	    	newItems = RssItem.getRssItems(feedUrl);
+	    	
+	    	DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
+	    	SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
+	    	Cursor cursor1 = null;
+	    	cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] {"max(" + NamesFeed.NamesColumns.PUPDATE + ")"}, NamesFeed.NamesColumns.NAMBER + " = ?",  new String[] { id }, null, null, null);
+	    	String str = "0";
+	    	if (cursor1 != null)
+	    	{
+	    		if (cursor1.moveToFirst())
+	    		{
+	    			for (String cn : cursor1.getColumnNames())
+	    			{
+	    				if (cursor1.getString(cursor1.getColumnIndex(cn)) !=null )
+	    				{
+	    					str = cursor1.getString(cursor1.getColumnIndex(cn));
+	    				}	
+	    			}
+	    		}
+	    		cursor1.close();
+	    	}
+	    	
+	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+	    		    		for (int i = 0; i < newItems.size(); i++)
+	    	{
+	    			ManControllerFeed.write(getBaseContext(), id ,'"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str, "no_favorites");
+	    	}
+	    	return null;
+	    }
+
+	    @Override
+	    protected void onPostExecute(Void result) 
+	    {
+	    	super.onPostExecute(result);
+	    	refressRssList();
+	    }
+	  }
+	
 	public void refressRssList() 
 	{		
 		
