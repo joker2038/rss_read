@@ -31,10 +31,8 @@ import database.menu.ManControllerMenu;
 
 public class main  extends Activity
 {	
-	Timer timer1 = new Timer();
-	boolean flagTimer1 = false;
-	Timer timer2 = new Timer();
-	boolean flagTimer2 = false;
+	boolean flagD = false;
+	boolean flagU = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) 
@@ -295,6 +293,7 @@ public class main  extends Activity
    
     public void delete() 
 	{
+		flagD = true;
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
 		Calendar Current_Calendar = Calendar.getInstance();
 		Date Current_Date = Current_Calendar.getTime();
@@ -306,12 +305,11 @@ public class main  extends Activity
 		ManControllerFeed.delete(getBaseContext(), dateTemp);	
 		dbhelper.close();
 		sqliteDB.close();
-		
-		flagTimer1 = false;
+		flagD = false;
 	}
      
     public void update() 
-	{    		
+	{    	    		
     	for (int j = 0; j < MainActivity.data[0].length; j++)
     	{    		
     		ArrayList<RssItem> newItems = new ArrayList<RssItem>();
@@ -345,86 +343,69 @@ public class main  extends Activity
     			ManControllerFeed.write(getBaseContext(), MainActivity.data[0][j],'"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str, "no_favorites");
 	    	}
     	}
-    	flagTimer2 = false;
+		flagU = false;
 	}     
     
     @Override
     public void onBackPressed()
-    {  
-    	if (flagTimer2 == false)
-    	{
-    		flag2:
-    		if (flagTimer1 == true)
-    		{
-    			break flag2;  	   	
-    		}
-    		
-	    	if (MainActivity.update_time == 1)
-	    	{
-	    		timer2.schedule( new TimerTask()
-	    		{          
-	    			@Override
-	    			public void run() 
-	    			{	    				
-	    				update();
-	    			}
-	    		}
-	    		, 0, MainActivity.update_time * 3600000);
-	    		flagTimer2 = true;
-	    	}
-	    	else if (MainActivity.update_time > 1)
-	    	{
-	    		timer2.schedule( new TimerTask()
-	    		{          
-	    			@Override
-	    			public void run() 
-	    			{
-	    				update();
-	    			}
-	    		}
-	    		, MainActivity.update_time/2 * 1800000, MainActivity.update_time/2 * 1800000);
-	    		flagTimer2 = true;
-	    	}
-    	}
-    	
-    	if (flagTimer1 == false)
-    	{
-    		flag1:
-    		if (flagTimer2 == true)
-    		{
-    			break flag1;  	
-    		}
-    		
-	    	if (MainActivity.storage_time == 1)
-	    	{
-	    		timer1.schedule( new TimerTask()
-	    		{          
-	    			@Override
-	    			public void run() 
-	    			{
-	    				delete();
-	    			}
-	    		}
-	    		, 0, MainActivity.storage_time * 86400000);
-	    		flagTimer1 = true;
-	    	}
-	    	else if (MainActivity.storage_time > 1)
-	    	{
-	    		timer1.schedule( new TimerTask()
-	    		{          
-	    			@Override
-	    			public void run() 
-	    			{
-	    				delete();
-	    			}
-	    		}
-	    		, MainActivity.storage_time/2 * 43200000, MainActivity.storage_time/2 * 43200000);
-	    		flagTimer1 = true;
-	    	}
-    	}
-    	
+    { 
+    	Timer myTimerD = new Timer(); // Создаем таймер
+        myTimerD.schedule(new TimerTask() 
+        { // Определяем задачу
+            @Override
+            public void run()
+            {
+            	flag1:
+	            	if(!flagU)
+	            	{
+	            		flagD = true;
+	            		MyTaskDelete.run();
+	            	}
+	            	else
+	            	{
+	            		break flag1;
+	            	}
+            }
+        }, 0, MainActivity.storage_time * 86400000);
+        
+        Timer myTimerU = new Timer(); // Создаем таймер
+        myTimerU.schedule(new TimerTask() 
+        { // Определяем задачу
+            @Override
+            public void run()
+            {
+            	flag2:
+	            	if(!flagD)
+	            	{
+	            		flagU = true;
+	            		MyTaskUpdate.run();
+	            	}
+	            	else
+	            	{
+	            		break flag2;
+	            	}
+            }
+        }, 0, MainActivity.update_time * 3600000);
+
     	Intent intent = new Intent(main.this , MainActivity.class);
 	    startActivity(intent);
     }
-
+    
+    Thread MyTaskDelete = new Thread(new Runnable() 
+    {
+        @Override
+        public void run()
+        {        	
+        	delete();        	
+        }        
+    });
+    
+    Thread MyTaskUpdate = new Thread(new Runnable() 
+    {
+        @Override
+        public void run()
+        {        	
+        	update();        	
+        }        
+    });    
 }

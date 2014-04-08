@@ -2,7 +2,6 @@ package rssfeed;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import menu.main;
 import android.app.Activity;
