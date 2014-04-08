@@ -31,8 +31,10 @@ import database.menu.ManControllerMenu;
 
 public class main  extends Activity
 {	
-	boolean flagD = false;
-	boolean flagU = false;
+	Boolean flagD = false;
+	Boolean flagU = false;
+	int flagEmptyU = 0;
+	int flagEmptyD = 0;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) 
@@ -293,7 +295,6 @@ public class main  extends Activity
    
     public void delete() 
 	{
-		flagD = true;
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
 		Calendar Current_Calendar = Calendar.getInstance();
 		Date Current_Date = Current_Calendar.getTime();
@@ -349,43 +350,79 @@ public class main  extends Activity
     @Override
     public void onBackPressed()
     { 
-    	Timer myTimerD = new Timer(); // Создаем таймер
+    	final Timer myTimerD = new Timer(); // Создаем таймер
+    	
+    	if (MainActivity.storage_time > 0)
+    	{
+    		flagEmptyD = 0;
+    	}
+    	else
+    	{
+    		flagEmptyD = 1;
+    	}
+    	    	
         myTimerD.schedule(new TimerTask() 
         { // Определяем задачу
             @Override
             public void run()
             {
-            	flag1:
-	            	if(!flagU)
-	            	{
-	            		flagD = true;
-	            		MyTaskDelete.run();
-	            	}
-	            	else
-	            	{
-	            		break flag1;
-	            	}
+            	if (MainActivity.storage_time > 0)
+            	{
+	            	flag1:
+		            	if(flagU == false)
+		            	{
+		            		flagD = true;
+		            		MyTaskDelete.run();
+		            	}
+		            	else
+		            	{
+		            		break flag1;
+		            	}
+            	} 
+            	else 
+            	{
+            		MyTaskEmpty.run();
+            	}
             }
-        }, 0, MainActivity.storage_time * 86400000);
+        }, 0, (MainActivity.storage_time + flagEmptyD) * 86400000);
         
-        Timer myTimerU = new Timer(); // Создаем таймер
+        final Timer myTimerU = new Timer(); // Создаем таймер
+        
+        if (MainActivity.update_time > 0)
+    	{
+    		flagEmptyU = 0;
+    	}
+    	else
+    	{
+    		flagEmptyU = 1;
+    	}
+        
         myTimerU.schedule(new TimerTask() 
         { // Определяем задачу
             @Override
             public void run()
             {
-            	flag2:
-	            	if(!flagD)
-	            	{
-	            		flagU = true;
-	            		MyTaskUpdate.run();
-	            	}
-	            	else
-	            	{
-	            		break flag2;
-	            	}
+            	if (MainActivity.update_time > 0)
+            	{
+	            	flag2:
+		            	if(flagD == false)
+		            	{
+		            		flagU = true;
+		            		MyTaskUpdate.run();
+		            	}
+		            	else
+		            	{
+		            		break flag2;
+		            	}
+            	}
+            	else
+            	{
+            		MyTaskEmpty.run();
+            	}
             }
-        }, 0, MainActivity.update_time * 3600000);
+        }, 0, (MainActivity.update_time + flagEmptyU) * 3600000);
+        
+        myTimerU.cancel();
 
     	Intent intent = new Intent(main.this , MainActivity.class);
 	    startActivity(intent);
@@ -397,7 +434,7 @@ public class main  extends Activity
         public void run()
         {        	
         	delete();        	
-        }        
+        }
     });
     
     Thread MyTaskUpdate = new Thread(new Runnable() 
@@ -406,6 +443,13 @@ public class main  extends Activity
         public void run()
         {        	
         	update();        	
-        }        
+        }  
     });    
+    Thread MyTaskEmpty = new Thread(new Runnable() 
+    {
+        @Override
+        public void run()
+        {        	      	
+        }  
+    }); 
 }
