@@ -350,7 +350,7 @@ public class main  extends Activity
     @Override
     public void onBackPressed()
     { 
-    	final Timer myTimerD = new Timer(); // Создаем таймер
+    	Timer myTimerD = new Timer(); // Создаем таймер
     	
     	if (MainActivity.storage_time > 0)
     	{
@@ -386,7 +386,7 @@ public class main  extends Activity
             }
         }, 0, (MainActivity.storage_time + flagEmptyD) * 86400000);
         
-        final Timer myTimerU = new Timer(); // Создаем таймер
+        Timer myTimerU = new Timer(); // Создаем таймер
         
         if (MainActivity.update_time > 0)
     	{
