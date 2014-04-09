@@ -19,7 +19,7 @@ public class ManControllerFeed {
 	private static final boolean LOGV = false;
 	private static int maxRowsInNames = -1;
 	private static final String TAG = ManControllerFeed.class.getSimpleName();
-
+	
 	private ManControllerFeed() 
 	{
 	}
@@ -145,7 +145,9 @@ public class ManControllerFeed {
 			description = description.replace("<br>", "\r\n\t");
 			description = description.replace("<p>", "\r\n\t");
 			description = description.replace("<br />", "\r\n\t");
+			description = description.replace("<img src=", " ");
 
+			description = description.replaceAll(".jpg.*>{1}", ".jpg ");
 			description = description.replaceAll("<.*>", "");
 			description = description.replaceAll("&quot;", "");
 			description = description.replaceAll("&\\S*;", "");

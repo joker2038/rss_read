@@ -445,6 +445,7 @@ public class main  extends Activity
         	update();        	
         }  
     });    
+    
     Thread MyTaskEmpty = new Thread(new Runnable() 
     {
         @Override

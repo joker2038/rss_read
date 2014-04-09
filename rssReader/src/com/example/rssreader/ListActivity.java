@@ -91,7 +91,7 @@ public class ListActivity extends Activity
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int pos, long id) 
 			{
-				final CharSequence[] items = { "Удалить", "Сменить сылку" };
+				final CharSequence[] items = { "Удалить", "Сменить ссылку" };
 				AlertDialog.Builder builder3 = new AlertDialog.Builder(ListActivity.this);
 				builder3.setTitle("Выберите действие").setItems(items, new DialogInterface.OnClickListener() 
 				{
@@ -175,9 +175,27 @@ public class ListActivity extends Activity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		Intent intent = new Intent(this, main.class);
-		startActivity(intent);
-		return true;
+		switch (item.getItemId()) 
+		{
+	    case R.id.action_settings:
+	    	Intent intent_settings = new Intent(this, main.class);
+			startActivity(intent_settings);
+	        return true;
+	    case R.id.action_about:
+	    	// подключаем наш кастомный диалог лайаут
+			LayoutInflater li = LayoutInflater.from(context);
+			View promptsView = li.inflate(R.layout.about, null);
+			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+			// делаем его диалогом
+			alertDialogBuilder.setView(promptsView);
+			 // создаем диалог
+			AlertDialog alertDialog = alertDialogBuilder.create();
+			// показываем его
+			alertDialog.show();
+	        return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
 	}
 }
 

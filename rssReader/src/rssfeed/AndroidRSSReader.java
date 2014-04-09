@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import menu.main;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,9 +36,11 @@ import database.feed.ManControllerFeed;
 
 public class AndroidRSSReader extends Activity 
 {
+	final Context context = this;
 	public static RssItem selectedRssItem = null;
-	String feedUrl = "";
+	String urlLink = "";
 	String id = "";	
+	String name = "";
 	ListView rssListViewUnread = null;
 	ListView rssListViewRead = null;
 	ListView rssListViewFavorites = null;
@@ -48,7 +52,11 @@ public class AndroidRSSReader extends Activity
 	ArrayAdapter<String> adapter2 = null;
 	ArrayAdapter<String> adapter3 = null;
 	MyTask mt;
-	
+	int index = 0;
+	String temp = "";
+	String Flag = "";
+	String state = "";
+		
 	public static final int RssItemDialog = 1;	
 
 	/** Called when the activity is first created. */
@@ -91,16 +99,7 @@ public class AndroidRSSReader extends Activity
 	    
 	    // первая вкладка будет выбрана по умолчанию
         tabHost.setCurrentTabByTag("tag1");
-        
-        /* обработчик переключения вкладок
-        tabHost.setOnTabChangedListener(new OnTabChangeListener() 
-        {
-        	public void onTabChanged(String tabId) 
-        	{
-        		Toast.makeText(getBaseContext(), "tabId = " + tabId, Toast.LENGTH_SHORT).show();
-        	}
-        });*/
-      
+           
 		rssListViewUnread = (ListView) findViewById(R.id.rssListViewUnread);
 		rssListViewRead = (ListView) findViewById(R.id.rssListViewRead);
 		rssListViewFavorites = (ListView) findViewById(R.id.rssListViewFavorites);
@@ -109,11 +108,30 @@ public class AndroidRSSReader extends Activity
 		label.setTextSize(MainActivity.title_font);
 		
 		id = getIntent().getStringExtra("id").toString();
-		feedUrl = getIntent().getStringExtra("urlLink").toString();
-		label.setText(getIntent().getStringExtra("name").toString());
+		urlLink = getIntent().getStringExtra("urlLink").toString();
+		name = getIntent().getStringExtra("name").toString();		
+		
+		try
+		{
+			Flag = getIntent().getStringExtra("Flag").toString();
+		}
+		catch (Exception e)
+		{
+			Flag = "";
+		}
+
+		
+		label.setText(name);
 		
 		refressRssList();
 		
+		if(Flag.equals("next") || Flag.equals("last"))
+		{
+			index = getIntent().getIntExtra("index", 0);
+			state = getIntent().getStringExtra("state").toString();
+			open(index, state);
+		}
+				
 		// here we specify what to execute when individual list items clicked
 		rssListViewUnread.setOnItemClickListener(new OnItemClickListener() 
 		{
@@ -250,7 +268,6 @@ public class AndroidRSSReader extends Activity
 		        mt.execute();
 		    }
 		});
-		
 	}
 
 	class MyTask extends AsyncTask<Void, Void, Void> 
@@ -265,7 +282,7 @@ public class AndroidRSSReader extends Activity
 	    protected Void doInBackground(Void... params) 
 	    {
 	    	ArrayList<RssItem> newItems = new ArrayList<RssItem>();
-	    	newItems = RssItem.getRssItems(feedUrl);
+	    	newItems = RssItem.getRssItems(urlLink);
 	    	
 	    	DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 	    	SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
@@ -304,8 +321,7 @@ public class AndroidRSSReader extends Activity
 	  }
 	
 	public void refressRssList() 
-	{		
-		
+	{			
 		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
 		
@@ -379,61 +395,69 @@ public class AndroidRSSReader extends Activity
 		rssListViewUnread.setAdapter(adapter1);			
 		rssListViewRead.setAdapter(adapter2);		
 		rssListViewFavorites.setAdapter(adapter3);
-		
-		//c.close();	
-		//cursor1.close();
-		//sqliteDB.close();
-		//dbhelper.close();
-		
-		//ListActivity.BAZA_NAME = "";
 	}
 
-	private void open(int index, String temp)
+	public void open(int index, String temp)
 	{
-		//обновление прочитого
-		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
-		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
-		Cursor cursor1 = null;
-		if(temp.equals("read"))
+		try
 		{
-			cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][index] }, null, null, null);
-		}
-		else if (temp.equals("favorites"))
-		{
-			cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data3[0][index] }, null, null, null);
-		}
-		else if (temp.equals("unread"))
-		{
-			cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][index] }, null, null, null);
-		}
-		String str0 = null;
-		String str1 = null;
-        String str2 = null;
-        String str3 = null;
-		if (cursor1 != null)
-		{
-			if (cursor1.moveToFirst())
+			//обновление прочитого
+			DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
+			SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
+			Cursor cursor1 = null;
+			if(temp.equals("read"))
 			{
-				str0 = cursor1.getString(cursor1.getColumnIndex("_id"));
-				str1 = cursor1.getString(cursor1.getColumnIndex("title"));
-				str2 = cursor1.getString(cursor1.getColumnIndex("description"));
-				str3 = cursor1.getString(cursor1.getColumnIndex("link"));
+				cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data2[0][index] }, null, null, NamesFeed.DEFAULT_SORT);				
 			}
-			cursor1.close();
+			else if (temp.equals("favorites"))
+			{
+				cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data3[0][index] }, null, null, NamesFeed.DEFAULT_SORT);				
+			}
+			else if (temp.equals("unread"))
+			{
+				cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, null, "title=?", new String[] { "" + data1[0][index] }, null, null, NamesFeed.DEFAULT_SORT);				
+			}
+			String str0 = null;
+			String str1 = null;
+	        String str2 = null;
+	        String str3 = null;
+			if (cursor1 != null)
+			{
+				if (cursor1.moveToFirst())
+				{
+					str0 = cursor1.getString(cursor1.getColumnIndex("_id"));
+					str1 = cursor1.getString(cursor1.getColumnIndex("title"));
+					str2 = cursor1.getString(cursor1.getColumnIndex("description"));
+					str3 = cursor1.getString(cursor1.getColumnIndex("link"));
+				}
+				cursor1.close();
+			}
+			if (temp.equals("unread"))
+			{
+				ManControllerFeed.update(getBaseContext(), "read", Long.parseLong(str0));
+			}
+			dbhelper.close();
+			sqliteDB.close();
+			//refressRssList();
+						
+			Intent intent = new Intent(this, RssItemDisplayer.class);	
+			intent.putExtra("title", str1);
+			intent.putExtra("description", str2);
+			intent.putExtra("link", str3);
+			//
+			intent.putExtra("state", temp);
+			intent.putExtra("index", index);
+			//
+			intent.putExtra("name", name);	
+			intent.putExtra("id", id);
+			intent.putExtra("urlLink", urlLink);
+			
+			startActivity(intent);	
 		}
-		if (temp.equals("unread"))
+		catch (Exception e)
 		{
-			ManControllerFeed.update(getBaseContext(), "read", Long.parseLong(str0));
 		}
-		dbhelper.close();
-		sqliteDB.close();
-		refressRssList();
-					
-		Intent intent = new Intent(AndroidRSSReader.this, RssItemDisplayer.class);	
-		intent.putExtra("title", str1);
-		intent.putExtra("description", str2);
-		intent.putExtra("link", str3);
-		startActivity(intent);
+		
 	}
 	
 	private void addToFavorites(String pos,String temp)
@@ -473,8 +497,26 @@ public class AndroidRSSReader extends Activity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		Intent intent = new Intent(this, main.class);
-		startActivity(intent);
-		return true;
+		switch (item.getItemId()) 
+		{
+	    case R.id.action_settings:
+	    	Intent intent_settings = new Intent(this, main.class);
+			startActivity(intent_settings);
+	        return true;
+	    case R.id.action_about:
+	    	// подключаем наш кастомный диалог лайаут
+			LayoutInflater li = LayoutInflater.from(context);
+			View promptsView = li.inflate(R.layout.about, null);
+			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+			// делаем его диалогом
+			alertDialogBuilder.setView(promptsView);
+			 // создаем диалог
+			AlertDialog alertDialog = alertDialogBuilder.create();
+			// показываем его
+			alertDialog.show();
+	        return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
 	}
 }

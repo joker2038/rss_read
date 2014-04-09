@@ -2,10 +2,13 @@ package com.example.rssreader;
 
 import menu.main;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +24,7 @@ import database.menu.DatabaseOpenHelperMenu;
 
 public class MainActivity  extends Activity
 {	
+	final Context context = this;
 	public static int title_font = 0;
 	public static int news_font = 0;
 	public static int channel_list_font = 0;
@@ -120,8 +124,28 @@ public class MainActivity  extends Activity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		Intent intent = new Intent(this, main.class);
-		startActivity(intent);
-		return true;
+		// Операции для выбранного пункта меню
+	    switch (item.getItemId()) 
+		{
+	    case R.id.action_settings:
+	    	Intent intent_settings = new Intent(this, main.class);
+			startActivity(intent_settings);
+	        return true;
+	    case R.id.action_about:
+	    	// подключаем наш кастомный диалог лайаут
+	    	LayoutInflater li = LayoutInflater.from(context);
+	    	View promptsView = li.inflate(R.layout.about, null);
+	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+	    	// делаем его диалогом
+	    	alertDialogBuilder.setView(promptsView);
+	    	// создаем диалог
+	    	AlertDialog alertDialog = alertDialogBuilder.create();
+	    	// показываем его
+	    	alertDialog.show();
+	    	return true;	    	
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
+		
 	}
 }
