@@ -32,7 +32,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper
 	public void onCreate(SQLiteDatabase db) 
 	{
 		db.execSQL("CREATE TABLE " + NamesFeedList.TABLE_NAME + " (" + NamesFeedList.NamesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , " + NamesFeedList.NamesColumns.URL + " TEXT NOT NULL, " + NamesFeedList.NamesColumns.NAME + " TEXT NOT NULL );"); //список
-		db.execSQL("CREATE TABLE " + NamesFeed.TABLE_NAME + " (" + NamesFeed.NamesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , " + NamesFeed.NamesColumns.TITLE + " TEXT NOT NULL , " + NamesFeed.NamesColumns.DESCRIPTION + " TEXT NOT NULL , " + NamesFeed.NamesColumns.PUPDATE + " INTEGER NOT NULL , " + NamesFeed.NamesColumns.LINK + " TEXT NOT NULL , " + NamesFeed.NamesColumns.READ + " TEXT NOT NULL , " + NamesFeed.NamesColumns.FAVORITES + " TEXT NOT NULL , " + NamesFeed.NamesColumns.NAMBER + " INTEGER NOT NULL );"); //новости
+	    db.execSQL("CREATE TABLE " + NamesFeed.TABLE_NAME + " (" + NamesFeed.NamesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , " + NamesFeed.NamesColumns.TITLE + " TEXT NOT NULL , " + NamesFeed.NamesColumns.DESCRIPTION + " TEXT NOT NULL , " + NamesFeed.NamesColumns.PUPDATE + " INTEGER NOT NULL , " + NamesFeed.NamesColumns.LINK + " TEXT NOT NULL , " + NamesFeed.NamesColumns.READ + " TEXT NOT NULL , " + NamesFeed.NamesColumns.FAVORITES + " TEXT NOT NULL , " + NamesFeed.NamesColumns.NAMBER + " INTEGER NOT NULL );"); //новости
 	}
 
 	@Override

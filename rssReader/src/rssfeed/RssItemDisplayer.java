@@ -27,7 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.rssreader.MainActivity;
+import com.example.rssreader.ListActivity;
 import com.example.rssreader.R;
 
 public class RssItemDisplayer extends Activity implements OnTouchListener
@@ -64,13 +64,13 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 		LinearLayout layout = (LinearLayout) findViewById(R.id.LinearLayout); 
 		
 		TextView titleText = new TextView(this); 
-		titleText.setTextSize(MainActivity.title_font);
+		titleText.setTextSize(ListActivity.title_font);
 
 		TextView descriptionText = new TextView(this); 
-		descriptionText.setTextSize(MainActivity.news_font);
+		descriptionText.setTextSize(ListActivity.news_font);
 		
 		TextView url_linkText = new TextView(this); 
-		url_linkText.setTextSize(MainActivity.news_font);
+		url_linkText.setTextSize(ListActivity.news_font);
 			
 						
 		Pattern pattern = Pattern.compile("http\\S*");
@@ -138,6 +138,7 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 			intent.putExtra("Flag", Flag);
 			intent.putExtra("state", state);
 			startActivity(intent);
+			finish();
 	    }
 	    else if (xNew < xOld && xOld - xNew >= 100 && Flag.equals(""))
 	    {	
@@ -152,6 +153,7 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 			intent.putExtra("Flag", Flag);
 			intent.putExtra("state", state);
 			startActivity(intent);
+			finish();
 	    }
 	    return true;
 	  }

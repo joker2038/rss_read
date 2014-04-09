@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,22 +13,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import database.DatabaseContract.NamesFeedList;
-import database.DatabaseOpenHelper;
 import database.ManController;
-import database.menu.DatabaseContractMenu;
-import database.menu.DatabaseOpenHelperMenu;
 
 
 public class MainActivity  extends Activity
 {	
 	final Context context = this;
-	public static int title_font = 0;
-	public static int news_font = 0;
-	public static int channel_list_font = 0;
-	public static int storage_time = 0;
-	public static int update_time = 0;
-	public static String[][] data = null;
 		
     @Override
     public void onCreate(Bundle savedInstanceState) 
@@ -38,42 +26,6 @@ public class MainActivity  extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        DatabaseOpenHelper dbhelper1 = new DatabaseOpenHelper(getBaseContext());
-		SQLiteDatabase sqliteDB1 = dbhelper1.getReadableDatabase();
-		final Cursor c1 = sqliteDB1.query(NamesFeedList.TABLE_NAME, null, null, null, null, null, NamesFeedList.DEFAULT_SORT);
-				
-		if (c1 != null)
-		{
-			int iNew = -1;
-			data = new String[3][c1.getCount()];
-		    while(c1.moveToNext()) 
-		    {		  
-		    	iNew++;
-		    	data[0][iNew] = c1.getString(0);
-		        data[1][iNew] = c1.getString(1);
-		        data[2][iNew] = c1.getString(2);
-		    }
-		    c1.close();
-		}
-        
-        DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
-		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-		final Cursor c = sqliteDB.query(DatabaseContractMenu.Names.TABLE_NAME, null, null, null, null, null, null);
-		if (c != null)
-		{
-		      if (c.moveToFirst())
-		      {
-		    	  title_font = Integer.parseInt(c.getString(c.getColumnIndex("title_font")));
-		    	  news_font = Integer.parseInt(c.getString(c.getColumnIndex("news_font")));
-		    	  channel_list_font = Integer.parseInt(c.getString(c.getColumnIndex("channel_list_font")));
-		    	  storage_time = Integer.parseInt(c.getString(c.getColumnIndex("storage_time")));
-		    	  update_time = Integer.parseInt(c.getString(c.getColumnIndex("update_time")));
-		      }
-		      c.close();
-		}
-		dbhelper.close();
-		sqliteDB.close();
-		
         final EditText nameEdit = (EditText) findViewById(R.id.nameEdit);
         final EditText urlLinkEdit = (EditText) findViewById(R.id.urlLinkEdit);
           
@@ -109,6 +61,7 @@ public class MainActivity  extends Activity
 			{
 				Intent intent = new Intent(MainActivity.this , ListActivity.class);
 			    startActivity(intent);
+			    finish();
 			}			
 		});
     }

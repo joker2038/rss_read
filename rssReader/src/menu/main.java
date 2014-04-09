@@ -19,7 +19,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.example.rssreader.MainActivity;
+import com.example.rssreader.ListActivity;
 import com.example.rssreader.R;
 
 import database.DatabaseContract.NamesFeed;
@@ -43,7 +43,7 @@ public class main  extends Activity
         setContentView(R.layout.settings);
         
     	final TextView storage_news = (TextView) findViewById(R.id.storage_news);
-    	storage_news.setText("" + MainActivity.storage_time);
+    	storage_news.setText("" + ListActivity.storage_time);
     	   
     	Button plus = (Button) findViewById(R.id.plus);
     	plus.setOnClickListener(new OnClickListener() 
@@ -51,11 +51,11 @@ public class main  extends Activity
 			@Override
 			public void onClick(View arg0) 
 			{		
-				if(MainActivity.storage_time < 25)
+				if(ListActivity.storage_time < 25)
 				{					
-					MainActivity.storage_time++;
-					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._STORAGE_TIME, String.valueOf(MainActivity.storage_time), 1);				
-			    	storage_news.setText("" + MainActivity.storage_time);			
+					ListActivity.storage_time++;
+					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._STORAGE_TIME, String.valueOf(ListActivity.storage_time), 1);				
+			    	storage_news.setText("" + ListActivity.storage_time);			
 				}
 			}			
 		});
@@ -66,17 +66,17 @@ public class main  extends Activity
 			@Override
 			public void onClick(View arg0) 
 			{		
-				if(MainActivity.storage_time > 0)
+				if(ListActivity.storage_time > 0)
 				{
-					MainActivity.storage_time--;
-					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._STORAGE_TIME, String.valueOf(MainActivity.storage_time), 1);				
-			    	storage_news.setText("" + MainActivity.storage_time);		
+					ListActivity.storage_time--;
+					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._STORAGE_TIME, String.valueOf(ListActivity.storage_time), 1);				
+			    	storage_news.setText("" + ListActivity.storage_time);		
 				}
 			}			
 		});  
     	
     	final TextView update_time = (TextView) findViewById(R.id.update_time);
-    	update_time.setText("" + MainActivity.update_time);
+    	update_time.setText("" + ListActivity.update_time);
     	
     	Button plusNews = (Button) findViewById(R.id.pluseNews);
     	plusNews.setOnClickListener(new OnClickListener() 
@@ -84,11 +84,11 @@ public class main  extends Activity
 			@Override
 			public void onClick(View arg0) 
 			{		
-				if(MainActivity.update_time < 24)
+				if(ListActivity.update_time < 24)
 				{					
-					MainActivity.update_time++;
-					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._UPDATE_TIME, String.valueOf(MainActivity.update_time), 1);						
-					update_time.setText("" + MainActivity.update_time);			
+					ListActivity.update_time++;
+					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._UPDATE_TIME, String.valueOf(ListActivity.update_time), 1);						
+					update_time.setText("" + ListActivity.update_time);			
 				}
 			}			
 		});
@@ -99,11 +99,11 @@ public class main  extends Activity
 			@Override
 			public void onClick(View arg0) 
 			{		
-				if(MainActivity.update_time > 0)
+				if(ListActivity.update_time > 0)
 				{
-					MainActivity.update_time--;
-					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._UPDATE_TIME, String.valueOf(MainActivity.update_time), 1);						
-					update_time.setText("" + MainActivity.update_time);;		
+					ListActivity.update_time--;
+					ManControllerMenu.update(getBaseContext(), Names.NamesColumns._UPDATE_TIME, String.valueOf(ListActivity.update_time), 1);						
+					update_time.setText("" + ListActivity.update_time);;		
 				}
 			}			
 		});  
@@ -113,11 +113,11 @@ public class main  extends Activity
         RadioButton gr0_rad1 = (RadioButton)findViewById(R.id.gr0_radio1);
         RadioButton gr0_rad2 = (RadioButton)findViewById(R.id.gr0_radio2);
         
-        if (MainActivity.title_font == 10)
+        if (ListActivity.title_font == 10)
         {
         	gr0_rad0.setChecked(true);
         }
-        else if (MainActivity.title_font == 20)
+        else if (ListActivity.title_font == 20)
         {
         	gr0_rad1.setChecked(true);
         }
@@ -131,11 +131,11 @@ public class main  extends Activity
         RadioButton gr1_rad1 = (RadioButton)findViewById(R.id.gr1_radio1);
         RadioButton gr1_rad2 = (RadioButton)findViewById(R.id.gr1_radio2);
         
-        if (MainActivity.news_font == 10)
+        if (ListActivity.news_font == 10)
         {
         	gr1_rad0.setChecked(true);
         }
-        else if (MainActivity.news_font == 20)
+        else if (ListActivity.news_font == 20)
         {
         	gr1_rad1.setChecked(true);
         }
@@ -149,11 +149,11 @@ public class main  extends Activity
         RadioButton gr2_rad1 = (RadioButton)findViewById(R.id.gr2_radio1);
         RadioButton gr2_rad2 = (RadioButton)findViewById(R.id.gr2_radio2);
         
-        if (MainActivity.channel_list_font == 10)
+        if (ListActivity.channel_list_font == 10)
         {
         	gr2_rad0.setChecked(true);
         }
-        else if (MainActivity.channel_list_font == 20)
+        else if (ListActivity.channel_list_font == 20)
         {
         	gr2_rad1.setChecked(true);
         }
@@ -302,7 +302,7 @@ public class main  extends Activity
 		String dateNow = sdf.format(Current_Date);
 		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
-		dateTemp = Long.parseLong(dateNow) - MainActivity.storage_time * 1000000 ;
+		dateTemp = Long.parseLong(dateNow) - ListActivity.storage_time * 1000000 ;
 		ManControllerFeed.delete(getBaseContext(), dateTemp);	
 		dbhelper.close();
 		sqliteDB.close();
@@ -311,16 +311,16 @@ public class main  extends Activity
      
     public void update() 
 	{    	    		
-    	for (int j = 0; j < MainActivity.data[0].length; j++)
+    	for (int j = 0; j < ListActivity.data[0].length; j++)
     	{    		
     		ArrayList<RssItem> newItems = new ArrayList<RssItem>();
     		newItems.clear();
-    		newItems = RssItem.getRssItems(MainActivity.data[1][j]);
+    		newItems = RssItem.getRssItems(ListActivity.data[1][j]);
     	
     		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
     		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
     		Cursor cursor1 = null;
-    		cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] {"max(" + NamesFeed.NamesColumns.PUPDATE + ")"}, NamesFeed.NamesColumns.NAMBER + " = ?",  new String[] { MainActivity.data[0][j] }, null, null, null);
+    		cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] {"max(" + NamesFeed.NamesColumns.PUPDATE + ")"}, NamesFeed.NamesColumns.NAMBER + " = ?",  new String[] { ListActivity.data[0][j] }, null, null, null);
     		String str = "0";
     		if (cursor1 != null)
     		{
@@ -341,7 +341,7 @@ public class main  extends Activity
     	
     		for (int i = 0; i < newItems.size(); i++)
     		{
-    			ManControllerFeed.write(getBaseContext(), MainActivity.data[0][j],'"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str, "no_favorites");
+    			ManControllerFeed.write(getBaseContext(), ListActivity.data[0][j],'"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str, "no_favorites");
 	    	}
     	}
 		flagU = false;
@@ -349,10 +349,10 @@ public class main  extends Activity
     
     @Override
     public void onBackPressed()
-    { 
+    {    	
     	Timer myTimerD = new Timer(); // Создаем таймер
     	
-    	if (MainActivity.storage_time > 0)
+    	if (ListActivity.storage_time > 0)
     	{
     		flagEmptyD = 0;
     	}
@@ -366,7 +366,7 @@ public class main  extends Activity
             @Override
             public void run()
             {
-            	if (MainActivity.storage_time > 0)
+            	if (ListActivity.storage_time > 0)
             	{
 	            	flag1:
 		            	if(flagU == false)
@@ -384,11 +384,12 @@ public class main  extends Activity
             		MyTaskEmpty.run();
             	}
             }
-        }, 0, (MainActivity.storage_time + flagEmptyD) * 86400000);
+        }, 0, (ListActivity.storage_time + flagEmptyD) * 86400000);
+        
         
         Timer myTimerU = new Timer(); // Создаем таймер
         
-        if (MainActivity.update_time > 0)
+        if (ListActivity.update_time > 0)
     	{
     		flagEmptyU = 0;
     	}
@@ -402,7 +403,7 @@ public class main  extends Activity
             @Override
             public void run()
             {
-            	if (MainActivity.update_time > 0)
+            	if (ListActivity.update_time > 0)
             	{
 	            	flag2:
 		            	if(flagD == false)
@@ -420,12 +421,11 @@ public class main  extends Activity
             		MyTaskEmpty.run();
             	}
             }
-        }, 0, (MainActivity.update_time + flagEmptyU) * 3600000);
+        }, 0, (ListActivity.update_time + flagEmptyU) * 3600000);
         
-        myTimerU.cancel();
-
-    	Intent intent = new Intent(main.this , MainActivity.class);
+    	Intent intent = new Intent(main.this , ListActivity.class);
 	    startActivity(intent);
+	    finish();
     }
     
     Thread MyTaskDelete = new Thread(new Runnable() 
@@ -441,8 +441,15 @@ public class main  extends Activity
     {
         @Override
         public void run()
-        {        	
-        	update();        	
+        {
+        	try 
+        	{        		
+        		update(); 
+        	}
+        	catch (Exception e) 
+        	{
+        		e.getLocalizedMessage();
+        	}
         }  
     });    
     

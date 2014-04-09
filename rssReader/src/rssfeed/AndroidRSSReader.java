@@ -26,7 +26,7 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.example.rssreader.MainActivity;
+import com.example.rssreader.ListActivity;
 import com.example.rssreader.R;
 
 import database.DatabaseContract.NamesFeed;
@@ -105,7 +105,7 @@ public class AndroidRSSReader extends Activity
 		rssListViewFavorites = (ListView) findViewById(R.id.rssListViewFavorites);
 		
 		TextView label = (TextView) findViewById(R.id.label);
-		label.setTextSize(MainActivity.title_font);
+		label.setTextSize(ListActivity.title_font);
 		
 		id = getIntent().getStringExtra("id").toString();
 		urlLink = getIntent().getStringExtra("urlLink").toString();
@@ -191,9 +191,9 @@ public class AndroidRSSReader extends Activity
 										ManControllerFeed.update(getBaseContext(), "no_favorites", Long.parseLong(str0));												
 										dbhelper.close();
 										sqliteDB.close();
-										Intent intent = getIntent();
-								        finish();
+										Intent intent = getIntent();								        
 								        startActivity(intent);
+								        finish();
 									}
 										break;
 								}
@@ -373,13 +373,13 @@ public class AndroidRSSReader extends Activity
 		
 		CursorFavorites.close();
 		
-		if (MainActivity.channel_list_font == 10)
+		if (ListActivity.channel_list_font == 10)
         {
 			adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data1[0]);
 			adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data2[0]);
 			adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data3[0]);
         }
-        else if (MainActivity.channel_list_font == 20)
+        else if (ListActivity.channel_list_font == 20)
         {
         	adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data1[0]);
         	adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data2[0]);
@@ -452,7 +452,8 @@ public class AndroidRSSReader extends Activity
 			intent.putExtra("id", id);
 			intent.putExtra("urlLink", urlLink);
 			
-			startActivity(intent);	
+			startActivity(intent);
+			finish();
 		}
 		catch (Exception e)
 		{
