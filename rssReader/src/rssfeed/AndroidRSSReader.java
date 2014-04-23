@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import menu.main;
+import rssreader.ListActivity;
+import ru.joker2038.rssreader.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -25,10 +27,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
-
-import com.example.rssreader.ListActivity;
-import com.example.rssreader.R;
-
 import database.DatabaseContract.NamesFeed;
 import database.DatabaseOpenHelper;
 import database.feed.ManControllerFeed;
@@ -520,4 +518,11 @@ public class AndroidRSSReader extends Activity
 	        return super.onOptionsItemSelected(item);
 	    }
 	}
+
+	public void onBackPressed()
+    {     	
+		Intent intent = new Intent(AndroidRSSReader.this , ListActivity.class);;
+		startActivity(intent);
+		finish();
+    } 
 }

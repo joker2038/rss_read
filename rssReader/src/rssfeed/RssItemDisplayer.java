@@ -9,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import menu.main;
+import rssreader.ListActivity;
+import ru.joker2038.rssreader.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -27,9 +29,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.rssreader.ListActivity;
-import com.example.rssreader.R;
-
 public class RssItemDisplayer extends Activity implements OnTouchListener
 {	
 	ImageView image;
@@ -45,6 +44,7 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 	String Flag = "";
 	String state = "";
 	int index;
+	Intent intent;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -129,7 +129,7 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 	    	{
 	    		index++;		
 	    	}
-	    	Intent intent = new Intent(this, AndroidRSSReader.class);
+	    	intent = new Intent(this, AndroidRSSReader.class);
 	    	intent.putExtra("name", name);	
 			intent.putExtra("id", id);
 			intent.putExtra("urlLink", urlLink);
@@ -144,7 +144,7 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 	    {	
 	    	Flag = "last";
 	    	index--;		
-	    	Intent intent = new Intent(this, AndroidRSSReader.class);
+	    	intent = new Intent(this, AndroidRSSReader.class);
 	    	intent.putExtra("name", name);	
 			intent.putExtra("id", id);
 			intent.putExtra("urlLink", urlLink);
@@ -258,4 +258,18 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 	        return super.onOptionsItemSelected(item);
 	    }
 	}
+	
+	public void onBackPressed()
+    {     	
+		intent = new Intent(RssItemDisplayer.this, AndroidRSSReader.class);
+		intent.putExtra("name", name);	
+		intent.putExtra("id", id);
+		intent.putExtra("urlLink", urlLink);
+		//
+		intent.putExtra("index", index);
+		intent.putExtra("Flag", Flag);
+		intent.putExtra("state", state);
+		startActivity(intent);
+		finish();
+    }  
 }

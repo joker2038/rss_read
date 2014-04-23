@@ -1,7 +1,8 @@
-package com.example.rssreader;
+package rssreader;
 
-import menu.main;
+import menu.PrefActivity;
 import rssfeed.AndroidRSSReader;
+import ru.joker2038.rssreader.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -41,6 +42,8 @@ public class ListActivity extends Activity
 	public static int channel_list_font = 0;
 	public static int storage_time = 0;
 	public static int update_time = 0;
+	//
+	public static final int IDM_PREF = 101;
 		
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -77,6 +80,8 @@ public class ListActivity extends Activity
 		    }
 		    c1.close();
 		}
+		dbhelper1.close();
+		sqliteDB1.close();
         
         DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
 		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
@@ -207,35 +212,30 @@ public class ListActivity extends Activity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
+		menu.add(0,  IDM_PREF, 0, "Настройки");
+		return super.onCreateOptionsMenu(menu);
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		/*getMenuInflater().inflate(R.menu.main, menu);
+		return true;*/
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
+		Intent intent = new Intent();
 		switch (item.getItemId()) 
 		{
-	    case R.id.action_settings:
-	    	Intent intent_settings = new Intent(this, main.class);
-			startActivity(intent_settings);
-	        return true;
-	    case R.id.action_about:
-	    	// подключаем наш кастомный диалог лайаут
-			LayoutInflater li = LayoutInflater.from(context);
-			View promptsView = li.inflate(R.layout.about, null);
-			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-			// делаем его диалогом
-			alertDialogBuilder.setView(promptsView);
-			 // создаем диалог
-			AlertDialog alertDialog = alertDialogBuilder.create();
-			// показываем его
-			alertDialog.show();
+	    case IDM_PREF:
+	    	intent.setClass(this, PrefActivity.class); 
+	    	startActivity(intent);
 	        return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
 	}
+	
+	public void onBackPressed()
+    {    
+    }
 }
 

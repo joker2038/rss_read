@@ -1,16 +1,9 @@
 package menu;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import rssfeed.RssItem;
+import rssreader.ListActivity;
+import ru.joker2038.rssreader.R;
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
@@ -18,13 +11,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
-
-import com.example.rssreader.ListActivity;
-import com.example.rssreader.R;
-
-import database.DatabaseContract.NamesFeed;
-import database.DatabaseOpenHelper;
-import database.feed.ManControllerFeed;
 import database.menu.DatabaseContractMenu.Names;
 import database.menu.DatabaseOpenHelperMenu;
 import database.menu.ManControllerMenu;
@@ -291,173 +277,31 @@ public class main  extends Activity
 				sqliteDB.close();
 			}
         });     
-    }
-   
-    public void delete() 
-	{
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
-		Calendar Current_Calendar = Calendar.getInstance();
-		Date Current_Date = Current_Calendar.getTime();
-		long dateTemp = 0;
-		String dateNow = sdf.format(Current_Date);
-		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
-		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
-		dateTemp = Long.parseLong(dateNow) - ListActivity.storage_time * 1000000 ;
-		ManControllerFeed.delete(getBaseContext(), dateTemp);	
-		dbhelper.close();
-		sqliteDB.close();
-		flagD = false;
-	}
-     
-    public void update() 
-	{    	    		
-    	for (int j = 0; j < ListActivity.data[0].length; j++)
-    	{    		
-    		ArrayList<RssItem> newItems = new ArrayList<RssItem>();
-    		newItems.clear();
-    		newItems = RssItem.getRssItems(ListActivity.data[1][j]);
-    	
-    		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
-    		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();	
-    		Cursor cursor1 = null;
-    		cursor1 = sqliteDB.query(NamesFeed.TABLE_NAME, new String[] {"max(" + NamesFeed.NamesColumns.PUPDATE + ")"}, NamesFeed.NamesColumns.NAMBER + " = ?",  new String[] { ListActivity.data[0][j] }, null, null, null);
-    		String str = "0";
-    		if (cursor1 != null)
-    		{
-    			if (cursor1.moveToFirst())
-    			{
-    				for (String cn : cursor1.getColumnNames())
-    				{
-    					if (cursor1.getString(cursor1.getColumnIndex(cn)) !=null )
-    					{
-    						str = cursor1.getString(cursor1.getColumnIndex(cn));
-    					}	
-    				}
-    			}
-    			cursor1.close();
-    		}
-    		
-    		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
-    	
-    		for (int i = 0; i < newItems.size(); i++)
-    		{
-    			ManControllerFeed.write(getBaseContext(), ListActivity.data[0][j],'"' + newItems.get(i).getTitle().toString() + '"', '"' + newItems.get(i).getDescription().toString() + '"', sdf.format(newItems.get(i).getPubDate()), '"' + newItems.get(i).getLink().toString() + '"', '"' +"unread" + '"', str, "no_favorites");
-	    	}
-    	}
-		flagU = false;
-	}     
+    }    
     
     @Override
     public void onBackPressed()
-    {    	
-    	Timer myTimerD = new Timer(); // Создаем таймер
+    {     	
+    	if (ListActivity.storage_time == 0)
+    	{
+    		stopService(new Intent(this, DeleteService.class));       			
+    	}
+    	else
+    	{
+    		startService(new Intent(this, DeleteService.class));
+    	}
     	
-    	if (ListActivity.storage_time > 0)
+        if (ListActivity.update_time == 0)
     	{
-    		flagEmptyD = 0;
+        	stopService(new Intent(this, UpdateService.class));    
     	}
     	else
     	{
-    		flagEmptyD = 1;
+    		startService(new Intent(this, UpdateService.class));
     	}
-    	    	
-        myTimerD.schedule(new TimerTask() 
-        { // Определяем задачу
-            @Override
-            public void run()
-            {
-            	if (ListActivity.storage_time > 0)
-            	{
-	            	flag1:
-		            	if(flagU == false)
-		            	{
-		            		flagD = true;
-		            		MyTaskDelete.run();
-		            	}
-		            	else
-		            	{
-		            		break flag1;
-		            	}
-            	} 
-            	else 
-            	{
-            		MyTaskEmpty.run();
-            	}
-            }
-        }, 0, (ListActivity.storage_time + flagEmptyD) * 86400000);
-        
-        
-        Timer myTimerU = new Timer(); // Создаем таймер
-        
-        if (ListActivity.update_time > 0)
-    	{
-    		flagEmptyU = 0;
-    	}
-    	else
-    	{
-    		flagEmptyU = 1;
-    	}
-        
-        myTimerU.schedule(new TimerTask() 
-        { // Определяем задачу
-            @Override
-            public void run()
-            {
-            	if (ListActivity.update_time > 0)
-            	{
-	            	flag2:
-		            	if(flagD == false)
-		            	{
-		            		flagU = true;
-		            		MyTaskUpdate.run();
-		            	}
-		            	else
-		            	{
-		            		break flag2;
-		            	}
-            	}
-            	else
-            	{
-            		MyTaskEmpty.run();
-            	}
-            }
-        }, 0, (ListActivity.update_time + flagEmptyU) * 3600000);
         
     	Intent intent = new Intent(main.this , ListActivity.class);
 	    startActivity(intent);
 	    finish();
-    }
-    
-    Thread MyTaskDelete = new Thread(new Runnable() 
-    {
-        @Override
-        public void run()
-        {        	
-        	delete();        	
-        }
-    });
-    
-    Thread MyTaskUpdate = new Thread(new Runnable() 
-    {
-        @Override
-        public void run()
-        {
-        	try 
-        	{        		
-        		update(); 
-        	}
-        	catch (Exception e) 
-        	{
-        		e.getLocalizedMessage();
-        	}
-        }  
-    });    
-    
-    Thread MyTaskEmpty = new Thread(new Runnable() 
-    {
-        @Override
-        public void run()
-        {        	      	
-        }  
-    }); 
+    }      
 }

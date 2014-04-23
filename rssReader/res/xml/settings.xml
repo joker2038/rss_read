@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="@string/settings_size_of_the_text">
+            
+      <ListPreference
+		 android:key="headline_font_size"
+		 android:title="@string/headline_font_size"
+		 android:summary="@string/interface_settings_set_new_fsize"
+		 android:defaultValue="medium"
+		 android:entries="@array/font_size_list"
+		 android:entryValues="@array/entryvalues_font_size"
+		 android:dialogTitle="@string/interface_settings_enter_fsize" 
+	  />
+            
+      <ListPreference
+		 android:key="font_size_News"
+		 android:title="@string/font_size_News"
+		 android:summary="@string/interface_settings_set_new_fsize"
+		 android:defaultValue="medium"
+		 android:entries="@array/font_size_list"
+		 android:entryValues="@array/entryvalues_font_size"
+		 android:dialogTitle="@string/interface_settings_enter_fsize" 
+	  />
+      
+      <ListPreference
+		 android:key="font_size_of_the_channel_list"
+		 android:title="@string/font_size_of_the_channel_list"
+		 android:summary="@string/interface_settings_set_new_fsize"
+		 android:defaultValue="medium"
+		 android:entries="@array/font_size_list"
+		 android:entryValues="@array/entryvalues_font_size"
+		 android:dialogTitle="@string/interface_settings_enter_fsize" 
+	  />
+       
+   </PreferenceCategory>
+   
+   <PreferenceCategory android:title="@string/settings_text_color">
+              
+      <ListPreference
+		 android:key="headline_color_size"
+		 android:title="@string/headline_color_size"
+		 android:summary="@string/interface_settings_set_new_color"
+		 android:defaultValue="1"
+		 android:entries="@array/color_list"
+		 android:entryValues="@array/entryvalues_color"
+		 android:dialogTitle="@string/interface_settings_check_color" 
+	  />
+      
+      <ListPreference
+		 android:key="color_size_News"
+		 android:title="@string/color_size_News"
+		 android:summary="@string/interface_settings_set_new_color"
+		 android:defaultValue="#000000"
+		 android:entries="@array/color_list"
+		 android:entryValues="@array/entryvalues_color"
+		 android:dialogTitle="@string/interface_settings_check_color" 
+	  />
+      
+      <ListPreference
+		 android:key="color_size_of_the_channel_list"
+		 android:title="@string/color_size_of_the_channel_list"
+		 android:summary="@string/interface_settings_set_new_color"
+		 android:defaultValue="#000000"
+		 android:entries="@array/color_list"
+		 android:entryValues="@array/entryvalues_color"
+		 android:dialogTitle="@string/interface_settings_check_color" 
+	  />
+	   
+   </PreferenceCategory>
+   
+   <PreferenceCategory android:title="@string/settings_update">
+       
+       <ListPreference
+		 android:key="storage_news"
+		 android:title="@string/storage_news"
+		 android:summary="@string/history_hint"
+		 android:defaultValue="0"
+		 android:entries="@array/figures_storage"
+		 android:entryValues="@array/figures_storage"
+		 android:dialogTitle="@string/storage_news" 
+	  />
+      
+      <ListPreference
+		 android:key="update_news"
+		 android:title="@string/update_news"
+		 android:summary="@string/history_update"
+		 android:defaultValue="0"
+		 android:entries="@array/figures_update"
+		 android:entryValues="@array/figures_update"
+		 android:dialogTitle="@string/update_news" 
+	  />
+       
+   </PreferenceCategory>
+   
+   <PreferenceCategory android:title="@string/settings_language">
+      
+       <ListPreference
+		 android:key="pref_lng"
+		 android:title="@string/interface_settings_language"
+		 android:summary="@string/interface_settings_set_language"
+		 android:defaultValue="ru"
+		 android:entries="@array/lng_list"
+		 android:entryValues="@array/entryvalues_lng"
+		 android:dialogTitle="@string/interface_settings_check_language" 
+	  />
+       
+   </PreferenceCategory>
+   
+</PreferenceScreen>

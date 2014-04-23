@@ -18,9 +18,11 @@
     <string name="headline_font_size">Размер шрифта заголовка</string>
     <string name="font_size_News">Размер шрифта новости</string>
     <string name="font_size_of_the_channel_list">Размер шрифта списка каналов</string>
+    <string name="interface_settings_set_new_fsize">Устанавливает новый размер текста</string>
+    <string name="interface_settings_enter_fsize">Введите размер текста</string>
     <string name="storage_news">Хранение новости</string>
-    <string name="history_hint">Установите ноль, чтобы не удалять историю, или введите срок хранения</string>
-    <string name="history_update">Установите ноль, чтобы не обновлять автоматически новости, или введите период обнавления</string>
+    <string name="history_hint">Установите 0, чтобы не удалять историю, или введите срок хранения в днях.</string>
+    <string name="history_update">Установите 0, чтобы не обновлять автоматически новости, или введите период обнавления в часах.</string>
     <string name="Day">Дней</string>
     <string name="plus">+</string>
     <string name="minus">-</string>
@@ -29,5 +31,19 @@
     <string name="about_str">О программе</string>
     <string name="full_about">Данная работа является дипломным проектом. Реализует удобный интерфейс для получение и отображения новостей с сайтов поддерживавших rss 2.0.  Буду благодарен за выявление багов. Если вы нашли, какие либо ошибки, пожалуйста, свяжитесь со мной по электронной почте:</string>
     <string name="gmail">joker2038@gmail.com</string>
+    <string name="interface_settings_language">Язык приложения</string>
+    <string name="interface_settings_set_language">Устанавливает язык интерфейса</string>
+    <string name="interface_settings_check_language">Выберите язык</string>
+    <string name="settings_language">Настройки языка</string>
+    <string name="settings_size_of_the_text">Настройки размера текста</string>
+    <string name="settings_update">Настройки обновления</string>
+    <string name="settings_text_color">Настройки цвета текста</string>
+    <string name="headline_color_size">Цвет текста заголовка</string>
+    <string name="color_size_News">Цвет текста новости</string>
+    <string name="color_size_of_the_channel_list">Цвет текста списка каналов</string>
+    <string name="interface_settings_check_color">Выберите цвет</string>
+    <string name="interface_settings_set_new_color">Устанавливает новый цвет текста</string>
+    <string name="interface_settings_set_new_update">Устанавливает период обновления</string>
+    <string name="interface_settings_set_new_hint">Устанавливает период удаления</string>
 
 </resources>

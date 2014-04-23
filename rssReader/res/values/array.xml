@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string-array name="lng_list">        
+        <item>Русский</item>
+    </string-array>
+    
+    <string-array name="entryvalues_lng">
+        <item>ru</item>     
+    </string-array>
+    
+    <string-array name="color_list">        
+        <item>черный</item>
+		<item>красный</item>
+		<item>оранжевый</item>
+		<item>жёлтый</item>
+		<item>зелёный</item>
+		<item>голубой</item>
+		<item>синий</item>
+		<item>фиолетовый</item>
+    </string-array>
+    
+    <string-array name="entryvalues_color">
+        <item>#000000</item>
+		<item>#EE0000</item>
+		<item>#FF4500</item>
+		<item>#EEEE00</item>
+		<item>#9ACD32</item>
+		<item>#0099CC</item>
+		<item>#0D4F8B</item>
+		<item>#380474</item>       
+    </string-array>
+    
+    <string-array name="font_size_list">        
+        <item>Маленький</item>
+        <item>Средний</item>
+        <item>Большой</item>
+    </string-array>
+    
+    <string-array name="entryvalues_font_size">
+        <item>small</item>
+        <item>medium</item>
+        <item>big</item>      
+    </string-array>
+    
+    <string-array name="figures_storage">        
+        <item>0</item>     
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+    </string-array>
+    
+    <string-array name="figures_update">        
+        <item>0</item>     
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+    </string-array>
+    
+</resources>

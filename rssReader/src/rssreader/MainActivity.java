@@ -1,6 +1,7 @@
-package com.example.rssreader;
+package rssreader;
 
 import menu.main;
+import ru.joker2038.rssreader.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,7 +28,7 @@ public class MainActivity  extends Activity
         setContentView(R.layout.activity_main);
         
         final EditText nameEdit = (EditText) findViewById(R.id.nameEdit);
-        final EditText urlLinkEdit = (EditText) findViewById(R.id.urlLinkEdit);
+        final EditText urlLinkEdit = (EditText) findViewById(R.id.LinkEdit);
           
         Button add = (Button) findViewById(R.id.add);
         add.setOnClickListener(new OnClickListener() 
@@ -101,4 +102,11 @@ public class MainActivity  extends Activity
 	    }
 		
 	}
+	
+	public void onBackPressed()
+    {     	
+		Intent intent = new Intent(MainActivity.this , ListActivity.class);;
+		startActivity(intent);
+		finish();
+    } 
 }
