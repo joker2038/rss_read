@@ -8,14 +8,16 @@ import java.net.URLConnection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import menu.main;
-import rssreader.ListActivity;
+import menu.PrefActivity;
 import ru.joker2038.rssreader.R;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.util.Linkify;
@@ -31,6 +33,7 @@ import android.widget.TextView;
 
 public class RssItemDisplayer extends Activity implements OnTouchListener
 {	
+	final Context context = this;
 	ImageView image;
 	float xNew;
 	float xOld;
@@ -46,11 +49,28 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 	int index;
 	Intent intent;
 	
+	public static final int IDM_PREF = 101;
+	public static final int IDM_PR = 102;
+	public static final String APP_PREFERENCES = "ru.joker2038.rssreader_preferences"; 	
+	SharedPreferences mSettings;
+	String headline_font_size;
+	String font_size_News;
+	String headline_color_size;
+	String color_size_News;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.current_news);
+		
+		mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		headline_font_size = mSettings.getString("font_size_of_the_channel_list", "20");
+		font_size_News = mSettings.getString("font_size_News", "20");
+		//
+		headline_color_size = mSettings.getString("headline_color_size", "#000000");
+		color_size_News = mSettings.getString("color_size_News", "#000000");
+		
 		
 		title = getIntent().getStringExtra("title").toString();
 		description = getIntent().getStringExtra("description").toString();
@@ -64,14 +84,16 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 		LinearLayout layout = (LinearLayout) findViewById(R.id.LinearLayout); 
 		
 		TextView titleText = new TextView(this); 
-		titleText.setTextSize(ListActivity.title_font);
-
+		titleText.setTextSize(Integer.parseInt(headline_font_size));
+		titleText.setTextColor(Color.parseColor(headline_color_size));
+		
 		TextView descriptionText = new TextView(this); 
-		descriptionText.setTextSize(ListActivity.news_font);
+		descriptionText.setTextSize(Integer.parseInt(font_size_News));
+		descriptionText.setTextColor(Color.parseColor(color_size_News));
 		
 		TextView url_linkText = new TextView(this); 
-		url_linkText.setTextSize(ListActivity.news_font);
-			
+		url_linkText.setTextSize(Integer.parseInt(font_size_News));
+		url_linkText.setTextColor(Color.parseColor(color_size_News));	
 						
 		Pattern pattern = Pattern.compile("http\\S*");
 		Matcher matcher = pattern.matcher(description);		
@@ -225,35 +247,39 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
         }
     }
 	
-	public boolean onCreateOptionsMenu(Menu menu) 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
 	{
+		menu.add(0,  IDM_PREF, 0, "Настройки");
+		menu.add(0,  IDM_PR, 0, "О программе");
+		return super.onCreateOptionsMenu(menu);
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		/*getMenuInflater().inflate(R.menu.main, menu);
+		return true;*/
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		// Операции для выбранного пункта меню
-	    switch (item.getItemId()) 
+		Intent intent = new Intent();
+		switch (item.getItemId()) 
 		{
-	    case R.id.action_settings:
-	    	Intent intent_settings = new Intent(this, main.class);
-			startActivity(intent_settings);
+	    case IDM_PREF:
+	    	intent.setClass(this, PrefActivity.class); 
+	    	startActivity(intent);
 	        return true;
-	    case R.id.action_about:
+	    case IDM_PR:
 	    	// подключаем наш кастомный диалог лайаут
-	    	LayoutInflater li = LayoutInflater.from(this);
+	    	LayoutInflater li = LayoutInflater.from(context);
 	    	View promptsView = li.inflate(R.layout.about, null);
-	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 	    	// делаем его диалогом
 	    	alertDialogBuilder.setView(promptsView);
 	    	// создаем диалог
 	    	AlertDialog alertDialog = alertDialogBuilder.create();
 	    	// показываем его
 	    	alertDialog.show();
-	    	return true;	    	
+	    	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }

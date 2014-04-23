@@ -7,7 +7,9 @@ import java.util.TimerTask;
 
 import rssfeed.RssItem;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
@@ -16,8 +18,6 @@ import database.DatabaseContract.NamesFeed;
 import database.DatabaseContract.NamesFeedList;
 import database.DatabaseOpenHelper;
 import database.feed.ManControllerFeed;
-import database.menu.DatabaseContractMenu;
-import database.menu.DatabaseOpenHelperMenu;
 
 public class UpdateService extends Service
 {
@@ -27,6 +27,11 @@ public class UpdateService extends Service
     private Timer myTimerU = null;
     public static int update_time = 0;
     public static String[][] data = null;
+    //
+	public static final String APP_PREFERENCES = "ru.joker2038.rssreader_preferences"; 	
+	SharedPreferences mSettings;
+	String update_news;
+	long update_news_int;
 	
 	@Override 
     public IBinder onBind(Intent intent) 
@@ -37,15 +42,8 @@ public class UpdateService extends Service
 	@Override
 	public void onCreate() 
 	{ 
-		// cancel if already existed
-        if(myTimerU != null) 
-        {
-        	myTimerU.cancel();
-        } else 
-        {
-            // recreate new
-        	myTimerU = new Timer();
-        }
+		// recreate new
+    	myTimerU = new Timer();
     }	
 	
 	@Override
@@ -70,22 +68,20 @@ public class UpdateService extends Service
 		}
 		dbhelper1.close();
 		sqliteDB1.close();
-        
-        DatabaseOpenHelperMenu dbhelper2 = new DatabaseOpenHelperMenu(getBaseContext());
-		SQLiteDatabase sqliteDB2 = dbhelper2.getReadableDatabase();
-		final Cursor c = sqliteDB2.query(DatabaseContractMenu.Names.TABLE_NAME, null, null, null, null, null, null);
-		if (c != null)
-		{
-		      if (c.moveToFirst())
-		      {
-		    	  update_time = Integer.parseInt(c.getString(c.getColumnIndex("update_time")));
-		      }
-		      c.close();
-		}
-		dbhelper2.close();
-		sqliteDB2.close();
 		
-		myTimerU.scheduleAtFixedRate(new Update(), 0, update_time * 3600000);
+		mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		update_news = mSettings.getString("update_news", "0");
+    	
+		update_news_int = Long.parseLong(update_news);
+		
+		if (update_news_int * 3600000 < 9223372036854775807L)
+		{
+			myTimerU.scheduleAtFixedRate(new Update(), 0, update_news_int * 3600000);
+		}
+		else
+		{
+			myTimerU.scheduleAtFixedRate(new Update(), (update_news_int * 3600000)/2 , (update_news_int * 3600000)/2);
+		}
                 
         return super.onStartCommand(intent, flags, startId);
      }

@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -27,8 +28,6 @@ import database.DatabaseContract.NamesFeed;
 import database.DatabaseContract.NamesFeedList;
 import database.DatabaseOpenHelper;
 import database.ManController;
-import database.menu.DatabaseContractMenu;
-import database.menu.DatabaseOpenHelperMenu;
 
 public class ListActivity extends Activity 
 {	
@@ -37,19 +36,21 @@ public class ListActivity extends Activity
 	int rowId = 0;	
 	ArrayAdapter<String> adapter = null;
 	public static String[][] data = null;
-	public static int title_font = 0;
-	public static int news_font = 0;
-	public static int channel_list_font = 0;
-	public static int storage_time = 0;
-	public static int update_time = 0;
 	//
 	public static final int IDM_PREF = 101;
+	public static final int IDM_PR = 102;
+	public static final String APP_PREFERENCES = "ru.joker2038.rssreader_preferences"; 	
+	SharedPreferences mSettings;
+	String font_size_of_the_channel_list;
 		
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.feed_list);
+		
+		mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		font_size_of_the_channel_list = mSettings.getString("font_size_of_the_channel_list", "20");
 		
 		Button plus = (Button) findViewById(R.id.button1);
 		
@@ -81,31 +82,14 @@ public class ListActivity extends Activity
 		    c1.close();
 		}
 		dbhelper1.close();
-		sqliteDB1.close();
+		sqliteDB1.close();     
+		
         
-        DatabaseOpenHelperMenu dbhelper = new DatabaseOpenHelperMenu(getBaseContext());
-		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();
-		final Cursor c = sqliteDB.query(DatabaseContractMenu.Names.TABLE_NAME, null, null, null, null, null, null);
-		if (c != null)
-		{
-		      if (c.moveToFirst())
-		      {
-		    	  title_font = Integer.parseInt(c.getString(c.getColumnIndex("title_font")));
-		    	  news_font = Integer.parseInt(c.getString(c.getColumnIndex("news_font")));
-		    	  channel_list_font = Integer.parseInt(c.getString(c.getColumnIndex("channel_list_font")));
-		    	  storage_time = Integer.parseInt(c.getString(c.getColumnIndex("storage_time")));
-		    	  update_time = Integer.parseInt(c.getString(c.getColumnIndex("update_time")));
-		      }
-		      c.close();
-		}
-		dbhelper.close();
-		sqliteDB.close();
-								
-		if (channel_list_font == 10)
+		if (Integer.parseInt(font_size_of_the_channel_list) == 10)
         {
 			adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data[2]);
         }
-        else if (channel_list_font == 20)
+        else if (Integer.parseInt(font_size_of_the_channel_list) == 20)
         {
         	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data[2]);
         }
@@ -118,7 +102,7 @@ public class ListActivity extends Activity
 		
 		lv.setAdapter(adapter);
 			
-		lv.setOnItemClickListener(new OnItemClickListener() 
+		lv.setOnItemClickListener(new OnItemClickListener()  
 		{
 			@Override
 			public void onItemClick(AdapterView<?> a, View v, int position, long id) 
@@ -205,14 +189,13 @@ public class ListActivity extends Activity
 				return true;
 			}
 		});
-		dbhelper.close();
-		sqliteDB.close();
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(0,  IDM_PREF, 0, "Настройки");
+		menu.add(0,  IDM_PR, 0, "О программе");
 		return super.onCreateOptionsMenu(menu);
 		// Inflate the menu; this adds items to the action bar if it is present.
 		/*getMenuInflater().inflate(R.menu.main, menu);
@@ -229,6 +212,18 @@ public class ListActivity extends Activity
 	    	intent.setClass(this, PrefActivity.class); 
 	    	startActivity(intent);
 	        return true;
+	    case IDM_PR:
+	    	// подключаем наш кастомный диалог лайаут
+	    	LayoutInflater li = LayoutInflater.from(context);
+	    	View promptsView = li.inflate(R.layout.about, null);
+	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+	    	// делаем его диалогом
+	    	alertDialogBuilder.setView(promptsView);
+	    	// создаем диалог
+	    	AlertDialog alertDialog = alertDialogBuilder.create();
+	    	// показываем его
+	    	alertDialog.show();
+	    	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }

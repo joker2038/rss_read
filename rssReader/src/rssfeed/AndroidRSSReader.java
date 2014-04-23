@@ -3,7 +3,7 @@ package rssfeed;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import menu.main;
+import menu.PrefActivity;
 import rssreader.ListActivity;
 import ru.joker2038.rssreader.R;
 import android.app.Activity;
@@ -11,8 +11,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -54,6 +56,12 @@ public class AndroidRSSReader extends Activity
 	String temp = "";
 	String Flag = "";
 	String state = "";
+	public static final String APP_PREFERENCES = "ru.joker2038.rssreader_preferences"; 	
+	SharedPreferences mSettings;
+	String font_size_of_the_channel_list;
+	String color_size_of_the_channel_list;
+	public static final int IDM_PREF = 101;
+	public static final int IDM_PR = 102;
 		
 	public static final int RssItemDialog = 1;	
 
@@ -64,6 +72,9 @@ public class AndroidRSSReader extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
+		mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		font_size_of_the_channel_list = mSettings.getString("font_size_of_the_channel_list", "20");
+		color_size_of_the_channel_list  = mSettings.getString("color_size_of_the_channel_list", "#000000");
 		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
 	    // инициализация
 	    tabHost.setup();
@@ -103,7 +114,6 @@ public class AndroidRSSReader extends Activity
 		rssListViewFavorites = (ListView) findViewById(R.id.rssListViewFavorites);
 		
 		TextView label = (TextView) findViewById(R.id.label);
-		label.setTextSize(ListActivity.title_font);
 		
 		id = getIntent().getStringExtra("id").toString();
 		urlLink = getIntent().getStringExtra("urlLink").toString();
@@ -118,7 +128,8 @@ public class AndroidRSSReader extends Activity
 			Flag = "";
 		}
 
-		
+		label.setTextSize(Float.parseFloat(font_size_of_the_channel_list));
+		label.setTextColor(Color.parseColor(color_size_of_the_channel_list));	
 		label.setText(name);
 		
 		refressRssList();
@@ -371,13 +382,14 @@ public class AndroidRSSReader extends Activity
 		
 		CursorFavorites.close();
 		
-		if (ListActivity.channel_list_font == 10)
+		if (Integer.parseInt(font_size_of_the_channel_list) == 10)
         {
+			//0x7f0a0015
 			adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data1[0]);
 			adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data2[0]);
 			adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data3[0]);
         }
-        else if (ListActivity.channel_list_font == 20)
+        else if (Integer.parseInt(font_size_of_the_channel_list) == 20)
         {
         	adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data1[0]);
         	adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data2[0]);
@@ -486,34 +498,38 @@ public class AndroidRSSReader extends Activity
 	}
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) 
+	public boolean onCreateOptionsMenu(Menu menu)
 	{
+		menu.add(0,  IDM_PREF, 0, "Настройки");
+		menu.add(0,  IDM_PR, 0, "О программе");
+		return super.onCreateOptionsMenu(menu);
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		/*getMenuInflater().inflate(R.menu.main, menu);
+		return true;*/
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
+		Intent intent = new Intent();
 		switch (item.getItemId()) 
 		{
-	    case R.id.action_settings:
-	    	Intent intent_settings = new Intent(this, main.class);
-			startActivity(intent_settings);
+	    case IDM_PREF:
+	    	intent.setClass(this, PrefActivity.class); 
+	    	startActivity(intent);
 	        return true;
-	    case R.id.action_about:
+	    case IDM_PR:
 	    	// подключаем наш кастомный диалог лайаут
-			LayoutInflater li = LayoutInflater.from(context);
-			View promptsView = li.inflate(R.layout.about, null);
-			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-			// делаем его диалогом
-			alertDialogBuilder.setView(promptsView);
-			 // создаем диалог
-			AlertDialog alertDialog = alertDialogBuilder.create();
-			// показываем его
-			alertDialog.show();
-	        return true;
+	    	LayoutInflater li = LayoutInflater.from(context);
+	    	View promptsView = li.inflate(R.layout.about, null);
+	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+	    	// делаем его диалогом
+	    	alertDialogBuilder.setView(promptsView);
+	    	// создаем диалог
+	    	AlertDialog alertDialog = alertDialogBuilder.create();
+	    	// показываем его
+	    	alertDialog.show();
+	    	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }

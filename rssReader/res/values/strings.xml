@@ -22,7 +22,7 @@
     <string name="interface_settings_enter_fsize">Введите размер текста</string>
     <string name="storage_news">Хранение новости</string>
     <string name="history_hint">Установите 0, чтобы не удалять историю, или введите срок хранения в днях.</string>
-    <string name="history_update">Установите 0, чтобы не обновлять автоматически новости, или введите период обнавления в часах.</string>
+    <string name="history_update">Установите 0, чтобы не обновлять автоматически новости, или введите период обновления в часах.</string>
     <string name="Day">Дней</string>
     <string name="plus">+</string>
     <string name="minus">-</string>

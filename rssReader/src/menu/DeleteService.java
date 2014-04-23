@@ -7,15 +7,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.IBinder;
 import database.DatabaseOpenHelper;
 import database.feed.ManControllerFeed;
-import database.menu.DatabaseContractMenu;
-import database.menu.DatabaseOpenHelperMenu;
 
 public class DeleteService extends Service 
 {
@@ -23,7 +22,11 @@ public class DeleteService extends Service
     private Handler mHandler = new Handler();
     // timer handling
     private Timer myTimerD = null;
-    public static int storage_time = 0;
+    //
+	public static final String APP_PREFERENCES = "ru.joker2038.rssreader_preferences"; 	
+	SharedPreferences mSettings;
+	String storage_news;
+	long storage_news_int;
 	
 	@Override 
     public IBinder onBind(Intent intent) 
@@ -34,34 +37,26 @@ public class DeleteService extends Service
 	@Override
 	public void onCreate() 
 	{ 
-		// cancel if already existed
-        if(myTimerD != null) 
-        {
-        	myTimerD.cancel();
-        } else 
-        {
-            // recreate new
-        	myTimerD = new Timer();
-        }
+		// recreate new
+    	myTimerD = new Timer();
     }
     
     public int onStartCommand(Intent intent, int flags, int startId) 
     {   
-    	DatabaseOpenHelperMenu dbhelper1 = new DatabaseOpenHelperMenu(getBaseContext());
-		SQLiteDatabase sqliteDB1 = dbhelper1.getReadableDatabase();
-		final Cursor c = sqliteDB1.query(DatabaseContractMenu.Names.TABLE_NAME, null, null, null, null, null, null);
-		if (c != null)
-		{
-		      if (c.moveToFirst())
-		      {
-		    	  storage_time = Integer.parseInt(c.getString(c.getColumnIndex("storage_time")));
-		      }
-		      c.close();
-		}
-		dbhelper1.close();
-		sqliteDB1.close();
+    	mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+    	storage_news = mSettings.getString("storage_news", "0");
     	
-    	myTimerD.scheduleAtFixedRate(new Delete(), 0, storage_time * 86400000);   	
+    	storage_news_int = Long.parseLong(storage_news);
+    	
+		if (storage_news_int * 86400000 < 9223372036854775807L)
+		{
+			myTimerD.scheduleAtFixedRate(new Delete(), 0, storage_news_int * 86400000);
+		}
+		else
+		{
+			myTimerD.scheduleAtFixedRate(new Delete(), (storage_news_int * 86400000)/2 , (storage_news_int * 86400000)/2 );
+		}
+		
         return super.onStartCommand(intent, flags, startId);
      }
     
@@ -83,7 +78,7 @@ public class DeleteService extends Service
     		  		String dateNow = sdf.format(Current_Date);
     		  		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
     		  		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
-    		  		dateTemp = Long.parseLong(dateNow) - storage_time * 1000000 ;
+    		  		dateTemp = Long.parseLong(dateNow) - storage_news_int * 1000000 ;
     		  		ManControllerFeed.delete(getBaseContext(), dateTemp);	
     		  		dbhelper.close();
     		  		sqliteDB.close();

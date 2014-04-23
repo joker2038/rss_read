@@ -1,6 +1,6 @@
 package rssreader;
 
-import menu.main;
+import menu.PrefActivity;
 import ru.joker2038.rssreader.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,6 +20,8 @@ import database.ManController;
 public class MainActivity  extends Activity
 {	
 	final Context context = this;
+	public static final int IDM_PREF = 101;
+	public static final int IDM_PR = 102;
 		
     @Override
     public void onCreate(Bundle savedInstanceState) 
@@ -68,24 +70,27 @@ public class MainActivity  extends Activity
     }
     
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) 
-    {
-    	// Inflate the menu; this adds items to the action bar if it is present.
-    	getMenuInflater().inflate(R.menu.main, menu);
-    	return true;
-    }
-
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		menu.add(0,  IDM_PREF, 0, "Настройки");
+		menu.add(0,  IDM_PR, 0, "О программе");
+		return super.onCreateOptionsMenu(menu);
+		// Inflate the menu; this adds items to the action bar if it is present.
+		/*getMenuInflater().inflate(R.menu.main, menu);
+		return true;*/
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		// Операции для выбранного пункта меню
-	    switch (item.getItemId()) 
+		Intent intent = new Intent();
+		switch (item.getItemId()) 
 		{
-	    case R.id.action_settings:
-	    	Intent intent_settings = new Intent(this, main.class);
-			startActivity(intent_settings);
+	    case IDM_PREF:
+	    	intent.setClass(this, PrefActivity.class); 
+	    	startActivity(intent);
 	        return true;
-	    case R.id.action_about:
+	    case IDM_PR:
 	    	// подключаем наш кастомный диалог лайаут
 	    	LayoutInflater li = LayoutInflater.from(context);
 	    	View promptsView = li.inflate(R.layout.about, null);
@@ -96,11 +101,10 @@ public class MainActivity  extends Activity
 	    	AlertDialog alertDialog = alertDialogBuilder.create();
 	    	// показываем его
 	    	alertDialog.show();
-	    	return true;	    	
+	    	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
-		
 	}
 	
 	public void onBackPressed()
