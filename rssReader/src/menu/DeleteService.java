@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import database.DatabaseOpenHelper;
@@ -27,6 +28,7 @@ public class DeleteService extends Service
 	SharedPreferences mSettings;
 	String storage_news;
 	long storage_news_int;
+	myStorage ms;
 	
 	@Override 
     public IBinder onBind(Intent intent) 
@@ -71,21 +73,50 @@ public class DeleteService extends Service
                 @Override
                 public void run() 
                 {    
-                	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
-    		  		Calendar Current_Calendar = Calendar.getInstance();
-    		  		Date Current_Date = Current_Calendar.getTime();
-    		  		long dateTemp = 0;
-    		  		String dateNow = sdf.format(Current_Date);
-    		  		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
-    		  		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
-    		  		dateTemp = Long.parseLong(dateNow) - storage_news_int * 1000000 ;
-    		  		ManControllerFeed.delete(getBaseContext(), dateTemp);	
-    		  		dbhelper.close();
-    		  		sqliteDB.close();
+                	ms = new myStorage();
+        		  	ms.execute();                	
                 } 
             });
         }
 	}
+    
+    class myStorage extends AsyncTask<Void, Void, Void> 
+	  {
+		    @Override
+		    protected void onPreExecute() 
+		    {
+		      super.onPreExecute();
+		    }
+
+		    @Override
+		    protected Void doInBackground(Void... params) 
+		    {
+		      try 
+		      {
+		    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+  		  		Calendar Current_Calendar = Calendar.getInstance();
+  		  		Date Current_Date = Current_Calendar.getTime();
+  		  		long dateTemp = 0;
+  		  		String dateNow = sdf.format(Current_Date);
+  		  		DatabaseOpenHelper dbhelper = new DatabaseOpenHelper(getBaseContext());
+  		  		SQLiteDatabase sqliteDB = dbhelper.getReadableDatabase();		      		 
+  		  		dateTemp = Long.parseLong(dateNow) - storage_news_int * 1000000 ;
+  		  		ManControllerFeed.delete(getBaseContext(), dateTemp);	
+  		  		dbhelper.close();
+  		  		sqliteDB.close();
+		      } 
+		      catch (Exception e) 
+		      {
+		      }
+		      return null;
+		    }
+
+		    @Override
+		    protected void onPostExecute(Void result)
+		    {
+		      super.onPostExecute(result);
+		    }
+	  }
    
     @Override 
     public void onDestroy() 

@@ -14,6 +14,8 @@ public class PrefActivity extends PreferenceActivity
 		SharedPreferences mSettings;
 		String storage_news;
 		String update_news;
+		Intent intentStorage = null;	  	
+	  	Intent intentUpdate = null;	  	
 
 	  @SuppressWarnings("deprecation")
 	  @Override
@@ -29,54 +31,29 @@ public class PrefActivity extends PreferenceActivity
 		  	storage_news = mSettings.getString("storage_news", "0");
 		  	update_news = mSettings.getString("update_news", "0");
 			
-		  	myThreadStorage.start();
+			intentStorage = new Intent(this, DeleteService.class);		  	
+		  	intentUpdate = new Intent(this, UpdateService.class);		
+		  	
+		  	if (Integer.parseInt(storage_news) == 0)
+		  	{
+		  		stopService(intentStorage);       			
+		  	}
+		  	else
+		  	{
+		  		startService(intentStorage);
+		  	}
+		  	
+		  	if (Integer.parseInt(update_news) == 0)
+			{
+		  		stopService(intentUpdate);    
+			}
+			else
+			{
+				startService(intentUpdate);
+			}		    
 		    
-		  	myThreadUpdate.start();
-		  	 
 		  	Intent intent = new Intent(PrefActivity.this , ListActivity.class);
 			startActivity(intent);
 			finish();
 	  } 
-	  
-	  Thread myThreadStorage = new Thread(new Runnable() 
-	  {
-		    @Override
-		    public void run() 
-		    {
-		    	TaskStorage();
-		    }
-	  });
-	  
-	  Thread myThreadUpdate = new Thread(new Runnable() 
-	  {
-		    @Override
-		    public void run() 
-		    {
-		    	TaskUpdate();
-		    }
-	  });
-	  
-	  public void TaskStorage()
-	  {
-		  if (Integer.parseInt(storage_news) == 0)
-		  	{
-		  		stopService(new Intent(this, DeleteService.class));       			
-		  	}
-		  	else
-		  	{
-		  		startService(new Intent(this, DeleteService.class));
-		  	}
-	  }
-	  
-	  public void TaskUpdate()
-	  {
-		  if (Integer.parseInt(update_news) == 0)
-		  	{
-		      	stopService(new Intent(this, UpdateService.class));    
-		  	}
-		  	else
-		  	{
-		  		startService(new Intent(this, UpdateService.class));
-		  	}
-	  }
 }

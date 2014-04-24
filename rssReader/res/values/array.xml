@@ -101,6 +101,8 @@
         <item>22</item>
         <item>23</item>
         <item>24</item>
-    </string-array>
+    </string-array>  
+    
+    <color name="channel_list">#EE0000</color>
     
 </resources>

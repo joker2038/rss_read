@@ -3,6 +3,7 @@ package rssreader;
 import menu.PrefActivity;
 import rssfeed.AndroidRSSReader;
 import ru.joker2038.rssreader.R;
+import adapter.MyArrayAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -20,7 +21,6 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -34,7 +34,7 @@ public class ListActivity extends Activity
 	final Context context = this;
 	String[] urllink;
 	int rowId = 0;	
-	ArrayAdapter<String> adapter = null;
+	MyArrayAdapter adapter = null;
 	public static String[][] data = null;
 	//
 	public static final int IDM_PREF = 101;
@@ -42,6 +42,8 @@ public class ListActivity extends Activity
 	public static final String APP_PREFERENCES = "ru.joker2038.rssreader_preferences"; 	
 	SharedPreferences mSettings;
 	String font_size_of_the_channel_list;
+	String color_size_of_the_channel_list;
+	
 		
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -51,6 +53,7 @@ public class ListActivity extends Activity
 		
 		mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 		font_size_of_the_channel_list = mSettings.getString("font_size_of_the_channel_list", "20");
+		color_size_of_the_channel_list  = mSettings.getString("color_size_of_the_channel_list", "#000000");
 		
 		Button plus = (Button) findViewById(R.id.button1);
 		
@@ -85,18 +88,7 @@ public class ListActivity extends Activity
 		sqliteDB1.close();     
 		
         
-		if (Integer.parseInt(font_size_of_the_channel_list) == 10)
-        {
-			adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data[2]);
-        }
-        else if (Integer.parseInt(font_size_of_the_channel_list) == 20)
-        {
-        	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data[2]);
-        }
-        else
-        {
-        	adapter = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data[2]);
-        }
+		adapter = new MyArrayAdapter(this, data[2], font_size_of_the_channel_list, color_size_of_the_channel_list);
 		
 		final ListView lv = (ListView) findViewById(R.id.listView1);				
 		

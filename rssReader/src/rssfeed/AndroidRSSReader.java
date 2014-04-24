@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import menu.PrefActivity;
 import rssreader.ListActivity;
 import ru.joker2038.rssreader.R;
+import adapter.MyArrayAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -58,8 +59,8 @@ public class AndroidRSSReader extends Activity
 	String state = "";
 	public static final String APP_PREFERENCES = "ru.joker2038.rssreader_preferences"; 	
 	SharedPreferences mSettings;
-	String font_size_of_the_channel_list;
-	String color_size_of_the_channel_list;
+	String headline_font_size;
+	String headline_color_size;
 	public static final int IDM_PREF = 101;
 	public static final int IDM_PR = 102;
 		
@@ -70,12 +71,13 @@ public class AndroidRSSReader extends Activity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
 		
 		mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-		font_size_of_the_channel_list = mSettings.getString("font_size_of_the_channel_list", "20");
-		color_size_of_the_channel_list  = mSettings.getString("color_size_of_the_channel_list", "#000000");
-		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+		headline_font_size = mSettings.getString("headline_font_size", "20");
+		headline_color_size  = mSettings.getString("headline_color_size", "#000000");
+		
+		setContentView(R.layout.main);
+		TabHost tabHost = (TabHost) findViewById(R.id.tabhost);
 	    // инициализация
 	    tabHost.setup();
 	       
@@ -114,7 +116,7 @@ public class AndroidRSSReader extends Activity
 		rssListViewFavorites = (ListView) findViewById(R.id.rssListViewFavorites);
 		
 		TextView label = (TextView) findViewById(R.id.label);
-		
+
 		id = getIntent().getStringExtra("id").toString();
 		urlLink = getIntent().getStringExtra("urlLink").toString();
 		name = getIntent().getStringExtra("name").toString();		
@@ -128,8 +130,8 @@ public class AndroidRSSReader extends Activity
 			Flag = "";
 		}
 
-		label.setTextSize(Float.parseFloat(font_size_of_the_channel_list));
-		label.setTextColor(Color.parseColor(color_size_of_the_channel_list));	
+		label.setTextSize(Float.parseFloat(headline_font_size));
+		label.setTextColor(Color.parseColor(headline_color_size));	
 		label.setText(name);
 		
 		refressRssList();
@@ -382,26 +384,10 @@ public class AndroidRSSReader extends Activity
 		
 		CursorFavorites.close();
 		
-		if (Integer.parseInt(font_size_of_the_channel_list) == 10)
-        {
-			//0x7f0a0015
-			adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data1[0]);
-			adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data2[0]);
-			adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_small_size, data3[0]);
-        }
-        else if (Integer.parseInt(font_size_of_the_channel_list) == 20)
-        {
-        	adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data1[0]);
-        	adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data2[0]);
-        	adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_average_size, data3[0]);
-        }
-        else
-        {
-        	adapter1 = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data1[0]);
-        	adapter2 = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data2[0]);
-        	adapter3 = new ArrayAdapter<String>(this, R.layout.my_list_feed_large_size, data3[0]);
-        }
-						
+		adapter1 = new MyArrayAdapter(this, data1[0], headline_font_size, headline_color_size);
+		adapter2 = new MyArrayAdapter(this, data2[0], headline_font_size, headline_color_size);
+		adapter3 = new MyArrayAdapter(this, data3[0], headline_font_size, headline_color_size);
+        				
 		rssListViewUnread.setAdapter(adapter1);			
 		rssListViewRead.setAdapter(adapter2);		
 		rssListViewFavorites.setAdapter(adapter3);

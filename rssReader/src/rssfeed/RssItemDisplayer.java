@@ -53,10 +53,9 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 	public static final int IDM_PR = 102;
 	public static final String APP_PREFERENCES = "ru.joker2038.rssreader_preferences"; 	
 	SharedPreferences mSettings;
-	String headline_font_size;
 	String font_size_News;
-	String headline_color_size;
 	String color_size_News;
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -65,10 +64,7 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 		setContentView(R.layout.current_news);
 		
 		mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-		headline_font_size = mSettings.getString("font_size_of_the_channel_list", "20");
 		font_size_News = mSettings.getString("font_size_News", "20");
-		//
-		headline_color_size = mSettings.getString("headline_color_size", "#000000");
 		color_size_News = mSettings.getString("color_size_News", "#000000");
 		
 		
@@ -84,8 +80,8 @@ public class RssItemDisplayer extends Activity implements OnTouchListener
 		LinearLayout layout = (LinearLayout) findViewById(R.id.LinearLayout); 
 		
 		TextView titleText = new TextView(this); 
-		titleText.setTextSize(Integer.parseInt(headline_font_size));
-		titleText.setTextColor(Color.parseColor(headline_color_size));
+		titleText.setTextSize(Integer.parseInt(font_size_News));
+		titleText.setTextColor(Color.parseColor(color_size_News));
 		
 		TextView descriptionText = new TextView(this); 
 		descriptionText.setTextSize(Integer.parseInt(font_size_News));
